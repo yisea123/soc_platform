@@ -1,0 +1,45 @@
+#
+# NOTE! Don't add files that are generated in specific
+# subdirectories here. Add them in the ".gitignore" file
+# in that subdirectory instead.
+#
+# Normal rules
+#
+.*
+*~
+*.a
+*.d
+*.o
+*.hex
+*.map
+*.lst
+*.elf
+*.swp
+*.bin
+*.patch
+
+#
+# git files that we don't want to ignore even it they are dot-files
+#
+!.gitignore
+!.mailmap
+
+# Libero SOC FPGA project depended files
+/hw_platform/drivers_config
+/hw_platform/filelist
+
+# IAR EWARM generated files
+*.dep
+*.ewt
+*.pbd
+*.pbd.browse
+*.pbi
+*.pbi.cout
+
+# Keil uVision generated files
+*.scvd
+*.i
+*.crf
+*.lnp
+*.axf
+*.build_log
