@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\firmware_platform.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\freertos.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\hardware_platform.ewp</path>
+  </project>
+  <batchBuild>
+    <batchDefinition>
+      <name>Debug</name>
+      <member>
+        <project>board_config</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>hardware_platform</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>firmware_platform</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>freertos</project>
+        <configuration>Debug</configuration>
+      </member>
+      <member>
+        <project>application</project>
+        <configuration>Debug</configuration>
+      </member>
+    </batchDefinition>
+    <batchDefinition>
+      <name>Release</name>
+      <member>
+        <project>board_config</project>
+        <configuration>Release</configuration>
+      </member>
+      <member>
+        <project>hardware_platform</project>
+        <configuration>Release</configuration>
+      </member>
+      <member>
+        <project>firmware_platform</project>
+        <configuration>Release</configuration>
+      </member>
+      <member>
+        <project>freertos</project>
+        <configuration>Release</configuration>
+      </member>
+      <member>
+        <project>application</project>
+        <configuration>Release</configuration>
+      </member>
+    </batchDefinition>
+  </batchBuild>
+</workspace>
+
+
