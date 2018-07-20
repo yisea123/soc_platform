@@ -1995,10 +1995,10 @@
   <group>
     <name>sensor</name>
     <file>
-      <name>$PROJ_DIR$\..\..\fw_platform\sensor\coregpio_psensor.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\sensor\gpio_photosensor.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\fw_platform\sensor\coregpio_psensor.h</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\sensor\gpio_photosensor.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\fw_platform\sensor\photosensor.c</name>
