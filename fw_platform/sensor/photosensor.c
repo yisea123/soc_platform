@@ -10,11 +10,6 @@
 
 
 
-#define PWM_TO_BRIGHTNESS(duty,period)		(((duty)*(int)MAXIMUM_BRIGHTNESS)/(period))
-#define BRIGHTNESS_TO_DUTY(brightness,period)	(((brightness)*(period)/(int)MAXIMUM_BRIGHTNESS))
-
-
-
 int photosensor_install_devices(void)
 {
 	int i, rs, dev_err;
@@ -110,11 +105,20 @@ int photosensor_set_config(struct photosensor *sensor, const struct photosensor_
 }
 
 
-int photosensor_set_callback(struct photosensor *sensor, void (*callback)(struct photosensor *, void *), void *data)
+int photosensor_set_event(struct photosensor *sensor, sensor_event_t event, void (*eventhandle)(struct photosensor *, sensor_event_t, void *), void *data)
 {
 	if (!sensor)
 		return -1;
-	sensor->callback = callback;
-	sensor->callbackdata = data;
-	return 0;
+	sensor->eventtrigger = event;
+	sensor->eventhandle = eventhandle;
+	sensor->handledata = data;
+	return sensor->ops->set_event(sensor, event, eventhandle, data);
+}
+
+
+int photosensor_unset_event(struct photosensor *sensor, sensor_event_t event)
+{
+	if (!sensor)
+		return -1;
+	return sensor->ops->unset_event(sensor, event);
 }
