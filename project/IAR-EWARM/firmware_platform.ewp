@@ -1936,6 +1936,21 @@
     </settings>
   </configuration>
   <group>
+    <name>include</name>
+    <file>
+      <name>$PROJ_DIR$\..\..\include\irqcallback.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\include\motor.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\include\pwm.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\include\sensor.h</name>
+    </file>
+  </group>
+  <group>
     <name>motor</name>
     <file>
       <name>$PROJ_DIR$\..\..\fw_platform\motor\dcmotor.c</name>
@@ -2012,12 +2027,6 @@
   </file>
   <file>
     <name>$PROJ_DIR$\..\..\fw_platform\fpga_io.h</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\..\..\include\motor.h</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\..\..\include\sensor.h</name>
   </file>
 </project>
 
