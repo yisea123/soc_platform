@@ -320,6 +320,7 @@
           <state>$PROJ_DIR$/../../hw_platform/drivers_config/sys_config</state>
           <state>$PROJ_DIR$/../../include</state>
           <state>$PROJ_DIR$/../../fw_platform</state>
+          <state>$PROJ_DIR$/../../fw_platform/fpga</state>
           <state>$PROJ_DIR$/../../fw_platform/motor</state>
           <state>$PROJ_DIR$/../../fw_platform/sensor</state>
           <state>$PROJ_DIR$/../../fw_platform/scanunit</state>
@@ -1287,6 +1288,7 @@
           <state>$PROJ_DIR$/../../hw_platform/drivers_config/sys_config</state>
           <state>$PROJ_DIR$/../../include</state>
           <state>$PROJ_DIR$/../../fw_platform</state>
+          <state>$PROJ_DIR$/../../fw_platform/fpga</state>
           <state>$PROJ_DIR$/../../fw_platform/motor</state>
           <state>$PROJ_DIR$/../../fw_platform/sensor</state>
           <state>$PROJ_DIR$/../../fw_platform/scanunit</state>
@@ -1935,6 +1937,12 @@
       <data/>
     </settings>
   </configuration>
+  <group>
+    <name>fpga</name>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\fpga\fpga.c</name>
+    </file>
+  </group>
   <group>
     <name>include</name>
     <file>
