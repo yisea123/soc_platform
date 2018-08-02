@@ -2,13 +2,13 @@
 #define	__FPGA_H__
 
 
-#define BIT(x) 	(1<<x)
-#define REG_ADDR_SCAL	8
+#define BIT(x) 	(1<<(x))
+
 
 /* Section 1: FPGA control & information registers */
 /* memory map (offset): */
-#define FPGA_REG_CONTROL				
-#define FPGA_REG_VERSION				
+#define FPGA_REG_STATUS					0x0000
+#define FPGA_REG_VERSION				0x0004
 
 
 /* Section 2: FPGA interrupt registers */
@@ -16,6 +16,14 @@
 #define FPGA_REG_INT_ENABLE				0x0000	
 #define FPGA_REG_INT_CLEAR				0x0004	
 #define FPGA_REG_INT_STATUS				0x0018
+
+/* bits definition of FPGA_REG_INT_xxx */
+#define FPGA_REG_INT_SEL_TYPE1			BIT(0)
+#define FPGA_REG_INT_SEL_TYPE2			BIT(1)
+#define FPGA_REG_INT_SEL_TYPE3			BIT(2)
+#define FPGA_REG_INT_SEL_TYPE4			BIT(3)
+#define FPGA_REG_INT_SEL_TYPE5			BIT(4)
+#define FPGA_REG_INT_SEL_ALL			BIT(15)
 
 
 /* Section 3: position sensor (PWM) registers */

@@ -4,10 +4,10 @@
 #include <hw_reg_io.h>
 #include <string.h>
 
-#define readw(addr)			(*((uint16_t* )addr))
-#define readl(addr)			(*((uint32_t* )addr))
-#define writew(value, addr)	(*((uint16_t* )addr)=(uint16_t )value)
-#define writel(value, addr)	(*((uint32_t* )addr)=(uint32_t )value)
+#define readw(addr)			(*((volatile uint16_t* )(addr)))
+#define readl(addr)			(*((volatile uint32_t* )(addr)))
+#define writew(value, addr)	(*((volatile uint16_t* )(addr))=(uint16_t )(value))
+#define writel(value, addr)	(*((volatile uint32_t* )(addr))=(uint32_t )(value))
 
 static __INLINE int32_t fpga_readl(uint32_t *value, const volatile void  *addr)
 {
