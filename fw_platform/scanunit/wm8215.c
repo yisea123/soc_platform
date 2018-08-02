@@ -190,7 +190,7 @@ int wm8215_install(struct imagedigitiser *afe)
 	*/
 	MSS_SPI_init(afe_rc->mss_spi);
 	if (afe_rc->spi_clk_freq != 0)
-		clk_div = MSS_SYS_M3_CLK_FREQ/afe_rc->spi_clk_freq;
+		clk_div = MSS_SYS_APB_1_CLK_FREQ/afe_rc->spi_clk_freq;
 	else
 		clk_div = 2;
 	MSS_SPI_configure_master_mode(afe_rc->mss_spi, MSS_SPI_SLAVE_0, MSS_SPI_MODE0, clk_div, 6+8);

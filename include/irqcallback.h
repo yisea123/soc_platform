@@ -2,6 +2,7 @@
 #define __IRQCALLBACK_H__
 
 #include <stdint.h>
+#include "mss_gpio.h"
 
 
 typedef	void *(*irqcallback_t)(void *, int , void *);

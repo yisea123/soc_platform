@@ -1,9 +1,8 @@
 /*
  * GWI FPGA-controlled CIS (Contact Image Sensor) driver
  *
- * Copyright 2016 Hunan GreatWall Information Financial Equipment Co., Ltd.
+ * Copyright 2018 Hunan GreatWall Information Financial Equipment Co., Ltd.
  *
- * Licensed under the GPL-2.
  */
 
 #include "../fpga.h"
