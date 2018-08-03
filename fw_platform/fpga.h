@@ -7,15 +7,15 @@
 
 /* Section 1: FPGA control & information registers */
 /* memory map (offset): */
-#define FPGA_REG_STATUS					0x0000
-#define FPGA_REG_VERSION				0x0004
+#define FPGA_REG_STATUS				0x0000
+#define FPGA_REG_VERSION			0x0004
 
 
 /* Section 2: FPGA interrupt registers */
 /* memory map (offset to base address): */
-#define FPGA_REG_INT_ENABLE				0x0000	
-#define FPGA_REG_INT_CLEAR				0x0004	
-#define FPGA_REG_INT_STATUS				0x0018
+#define FPGA_REG_INT_ENABLE			0x0000	
+#define FPGA_REG_INT_CLEAR			0x0004	
+#define FPGA_REG_INT_STATUS			0x0018
 
 /* bits definition of FPGA_REG_INT_xxx */
 #define FPGA_REG_INT_SEL_TYPE1			BIT(0)
@@ -72,23 +72,34 @@
 #define FPGA_REG_DCMOTOR_STOPPED_BY_SENSOR	BIT(1)
 
 
-/* Section 6: CIS control & information registers */
+/* Section 6: scanning control & information registers */
 /* memory map (offset): */
 #define FPGA_REG_CIS_CONTROL			0x0000
 #define FPGA_REG_CIS_T1				0x0004
-#define FPGA_REG_CIS_MAX_LIGHTON_TIME		0x0004
-#define FPGA_REG_CIS_T1				0x0004
-#define FPGA_REG_CIS_T1				0x0004
-#define FPGA_REG_CIS_T1				0x0004
-#define FPGA_REG_CIS_T1				0x0004
+#define FPGA_REG_CIS_MAX_LIGHTON_TIME		0x0008
+#define FPGA_REG_CIS_DPI			0x1000
+#define FPGA_REG_CIS_T_SI_H			0x1004
+#define FPGA_REG_CIS_T_SI_L			0x1008
+#define FPGA_REG_CIS_T_SI_L_PLUS		0x1024
+#define FPGA_REG_CIS_SCANLINES			0x1028
 
 /* bits definition of FPGA_REG_CIS_CONTROL */
 #define FPGA_REG_CIS_SCAN_ENABLE		BIT(0)
 #define FPGA_REG_CIS_LEDS_ENABLE		BIT(1)
-#define FPGA_REG_CIS_SCAN_TRIGGER_ENABLE	BIT(8)
-#define FPGA_REG_CIS_SCANMODE_SIX_LIGHTS	(0x0 << 2)
-#define FPGA_REG_CIS_SCANMODE_TEN_LIGHTS	(0x1 << 2)
-#define FPGA_REG_CIS_SCANMODE_MASK		(0xf << 2)
+#define FPGA_REG_CIS_SCANMODE_EN_RED		BIT(2)
+#define FPGA_REG_CIS_SCANMODE_EN_GREEN		BIT(3)
+#define FPGA_REG_CIS_SCANMODE_EN_BLUE		BIT(4)
+#define FPGA_REG_CIS_SCANMODE_EN_GREYSCALE	BIT(5)
+#define FPGA_REG_CIS_SCANMODE_EN_IR		BIT(6)
+#define FPGA_REG_CIS_SCANMODE_EN_UV		BIT(7)
+#define FPGA_REG_CIS_SCANMODE_EN_RGB		(FPGA_REG_CIS_SCANMODE_EN_RED | FPGA_REG_CIS_SCANMODE_EN_GREEN | FPGA_REG_CIS_SCANMODE_EN_BLUE)
+#define FPGA_REG_CIS_SCANMODE_MASK		(0x3f << 2)
+
+
+/* bits definition of FPGA_REG_CIS_DPI */
+#define FPGA_REG_CIS_DPI_300			0x0
+#define FPGA_REG_CIS_DPI_600			0x1
+#define FPGA_REG_CIS_DPI_1200			0x2
 
 
 /* Section 7: Image ADC control & information registers */

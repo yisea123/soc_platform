@@ -15,6 +15,10 @@
 #include "imagesensor.h"
 
 
+extern const struct scanunit_hwinfo scanner_hwinfo;
+extern struct imagedigitiser imagedigitiser_list[];
+extern struct imagesensor imagesensor_list[];
+
 static volatile uint32_t *scanctrl_reg_base;
 static uint32_t scan_int_mask;
 
@@ -34,11 +38,13 @@ void scanunit_reset(void)
 
 void scanunit_set_timeout_value(unsigned int timeout)
 {
+	fpga_writel(timeout, scanctrl_reg_base + FPGA_REG_CIS_MAX_LIGHTON_TIME);
 }
 
 
 void scanunit_start_scanning(void)
 {
+	imagedigitiser_enable(imagedigitiser_get(0));
 	fpga_clear_interrupt(scan_int_mask);
 	fpga_enable_interrupt(scan_int_mask);
 	fpga_update_lbits(scanctrl_reg_base + FPGA_REG_CIS_CONTROL, FPGA_REG_CIS_SCAN_ENABLE, FPGA_REG_CIS_SCAN_ENABLE);
@@ -49,6 +55,7 @@ void scanunit_stop_scanning(void)
 {
 	fpga_disable_interrupt(scan_int_mask);
 	fpga_update_lbits(scanctrl_reg_base + FPGA_REG_CIS_CONTROL, FPGA_REG_CIS_SCAN_ENABLE, 0);
+	imagedigitiser_disable(imagedigitiser_get(0));
 }
 
 
@@ -64,49 +71,111 @@ void scanunit_turnoff_lights(void)
 }
 
 
-void scanunit_set_scanning_mode(int mode)
+void scanunit_set_scanning_mode(uint32_t mode)
 {
+	fpga_update_lbits(scanctrl_reg_base + FPGA_REG_CIS_CONTROL, FPGA_REG_CIS_SCANMODE_MASK, mode);
 }
 
 
-int scanunit_get_hwinfo(struct scanunit_hwinfo *hwinfo)
+int scanunit_get_hwinfo(const struct scanunit_hwinfo *hwinfo)
 {
+	if (!hwinfo)
+		return -1;
+	hwinfo = &scanner_hwinfo;
 	return 0;
 }
 
 
 int scanunit_get_digitiser_config(int device, struct scanunit_config *config)
 {
-	return 0;
+	int rs;
+
+	if (device < 0 || device >= scanner_hwinfo.digitisers) 
+		return -1;
+	if (config->regcount <= 0 || config->regconfig == NULL)
+		return -1;
+
+	rs = imagedigitiser_get_config(&imagedigitiser_list[device], config);
+
+	return rs;
 }
 
 
 int scanunit_set_digitiser_config(int device, const struct scanunit_config *config)
 {
-	return 0;
+	int rs;
+
+	if (device < 0 || device >= scanner_hwinfo.digitisers) 
+		return -1;
+	if (config->regcount <= 0 || config->regconfig == NULL)
+		return -1;
+
+	rs = imagedigitiser_set_config(&imagedigitiser_list[device], config);
+
+	return rs;
 }
 
 
 int scanunit_get_sensor_config(int device, struct scanunit_config *config)
 {
-	return 0;
+	int rs;
+
+	if (device < 0 || device >= scanner_hwinfo.digitisers) 
+		return -1;
+	if (config->regcount <= 0 || config->regconfig == NULL)
+		return -1;
+
+	rs = imagesensor_get_config(&imagesensor_list[device], config);
+
+	return rs;
 }
 
 
 int scanunit_set_sensor_config(int device, const struct scanunit_config *config)
 {
-	return 0;
+	int rs;
+
+	if (device < 0 || device >= scanner_hwinfo.digitisers) 
+		return -1;
+	if (config->regcount <= 0 || config->regconfig == NULL)
+		return -1;
+
+	rs = imagesensor_set_config(&imagesensor_list[device], config);
+
+	return rs;
 }
 
 
 int scanunit_get_sensor_common_config(struct scan_reg_config *regconfig)
 {
+	uint32_t value;
+
+	if (!regconfig)
+		return -1;
+
+	fpga_readl(&value, scanctrl_reg_base + regconfig->address);
+	regconfig->value = value & regconfig->mask;
+
 	return 0;
 }
 
 
 int scanunit_set_sensor_common_config(const struct scan_reg_config *regconfig)
 {
+	uint32_t value;
+
+	if (!regconfig)
+		return -1;
+
+	if (regconfig->mask != 0) {     // bit operation
+		fpga_readl(&value, scanctrl_reg_base + regconfig->address);
+		value &= ~regconfig->mask;
+		value |= regconfig->value & regconfig->mask;
+	}
+	else
+		value = regconfig->value;
+	fpga_writel(value, scanctrl_reg_base + regconfig->address);
+
 	return 0;
 }
 
