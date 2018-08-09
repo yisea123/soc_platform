@@ -22,6 +22,13 @@ uint32_t fpga_get_version(void)
 	return version;
 }
 
+static int  fpga_is_ready(void)
+{
+	uint32_t ready;
+	fpga_readl(&ready, ctrl_reg_base + FPGA_REG_STATUS);
+	return ready;
+
+}
 
 void fpga_reset(void)
 {
@@ -61,6 +68,8 @@ int fpga_install(const struct fpga_resource *fpga_rc)
 	ctrl_reg_base = (volatile uint32_t *)fpga_rc->ctrl_reg_base;
 	ints_reg_base = (volatile uint32_t *)fpga_rc->ints_reg_base;
 
+	while(!fpga_is_ready());
+	
 	fpga_reset();
 	return 0;
 }

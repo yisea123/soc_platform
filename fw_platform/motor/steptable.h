@@ -26,6 +26,10 @@ struct ramp_info {
 	struct speed_ramp speeds[MAX_SPEED_NUMS];		// speed ramp tables
 };
 
+typedef enum{
+	DEC_RAMP_SPECIFIC,
+	DEC_RAMP_REVERSED
+}dec_ramp_attr_t;
 
 /*
  * struct steppermotor speed table
@@ -35,7 +39,8 @@ struct motor_speedtable {
 	uint32_t ramp_size;
 	uint32_t start_speed;
 	uint32_t object_speed;
-	uint32_t ramp_table[];
+	uint32_t *ramp_table;
+	dec_ramp_attr_t dec_ramp_attr;
 };
 
 

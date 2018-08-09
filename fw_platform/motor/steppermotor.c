@@ -15,7 +15,6 @@ static inline void time_to_count(int count, uint32_t *ramp_table, int clock)
 		ramp_table[i] /= clock;
 }
 
-
 /*
  * motor_ramptable_convert() - convert all time values from nanoseconds to ticks in a steppermotor's ramptable
  * @dev: device structure pointer of the steppermotor
@@ -36,10 +35,16 @@ int steppermotor_ramptable_convert(struct ramp_info *rampinfo, int clock)
 		speedtable = rampinfo->speeds[i].accel_table;
 		time_to_count(speedtable->ramp_size, speedtable->ramp_table, clock);
 		speedtable = rampinfo->speeds[i].decel_table;
-		time_to_count(speedtable->ramp_size, speedtable->ramp_table, clock);
-		rampinfo->speeds[i].step_ticks = speedtable->ramp_table[0];
+		
+		if(speedtable->dec_ramp_attr != DEC_RAMP_REVERSED)
+		{			
+			time_to_count(speedtable->ramp_size, speedtable->ramp_table, clock);
+			rampinfo->speeds[i].step_ticks = speedtable->ramp_table[0];
+		}
+		else
+			rampinfo->speeds[i].step_ticks = speedtable->ramp_table[speedtable->ramp_size-1];
+		
 	}
-
 	return 0;
 }
 
@@ -99,6 +104,9 @@ int steppermotor_check_config(struct steppermotor *motor, const struct steppermo
 	if (steps <= 0)
 		return -1;
 
+	steps -= motor->feature.speeds[index1].decel_steps;
+	if (steps <= 0)
+		return -1;
 	return 0;
 }
 

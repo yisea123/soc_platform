@@ -33,9 +33,9 @@
 /* Section 4: steppermotor control registers and speed profile table */
 /* memory map (offset to unit base): */
 #define FPGA_REG_MOTOR_CONTROL			0x0000
-#define FPGA_REG_MOTOR_STATUS			0x0010
+//#define FPGA_REG_MOTOR_STATUS			0x0010
 #define FPGA_REG_MOTOR_RUNNING_STEPS		0x000c
-#define FPGA_REG_MOTOR_SCANSTART_STEPS		0x003c
+//#define FPGA_REG_MOTOR_SCANSTART_STEPS		0x003c
 #define FPGA_REG_MOTOR_ACCEL_STEPS		0x0040
 #define FPGA_REG_MOTOR_CONST_STEPS		0x0044
 #define FPGA_REG_MOTOR_DECEL_STEPS		0x0048
@@ -49,18 +49,15 @@
 
 #define FPGA_REG_MOTOR_CONTROL_MASK 		0xf
 
-/* size of steppermotor speed ramp tables: */
-#define FPGA_RAM_MOTOR_TABLE_RAMP_DEPTH		1024
-#define FPGA_RAM_MOTOR_TABLE_COUNT_DEPTH	16
-//
-#define FPGA_RAM_MOTOR_TABLE_RAMP_SIZE		(4*FPGA_RAM_MOTOR_TABLE_RAMP_DEPTH)
-#define FPGA_RAM_MOTOR_TABLE_COUNT_SIZE		(4*FPGA_RAM_MOTOR_TABLE_COUNT_DEPTH)
-
 //
 /* memory map (offset to unit base): */
 #define FPGA_RAM_MOTOR_TABLE_RAMP		0x0000
-#define FPGA_RAM_MOTOR_TABLE_COUNT		0x1e40
+//#define FPGA_RAM_MOTOR_TABLE_COUNT		0x1e40
 
+/* bits definition of FPGA_RAM_MOTOR_TABLE_RAMP */
+#define FPGA_RAM_MOTOR_TABLE_RAMP_ACCEL	0
+#define FPGA_RAM_MOTOR_TABLE_RAMP_CONST1	(1<<14)
+#define FPGA_RAM_MOTOR_TABLE_RAMP_DECEL	(3<<14)
 
 /* Section 5: DC-motor control registers */
 /* memory map (offset to unit base): */
