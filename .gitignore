@@ -43,3 +43,7 @@
 *.lnp
 *.axf
 *.build_log
+
+# files in temporary directory
+tmp/
+temp/
