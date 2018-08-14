@@ -324,6 +324,8 @@
           <state>$PROJ_DIR$/../../fw_platform/motor</state>
           <state>$PROJ_DIR$/../../fw_platform/sensor</state>
           <state>$PROJ_DIR$/../../fw_platform/scanunit</state>
+          <state>$PROJ_DIR$/../../FreeRTOS/include</state>
+          <state>$PROJ_DIR$/../../FreeRTOS/portable/IAR/ARM_CM3</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1292,6 +1294,8 @@
           <state>$PROJ_DIR$/../../fw_platform/motor</state>
           <state>$PROJ_DIR$/../../fw_platform/sensor</state>
           <state>$PROJ_DIR$/../../fw_platform/scanunit</state>
+          <state>$PROJ_DIR$/../../FreeRTOS/include</state>
+          <state>$PROJ_DIR$/../../FreeRTOS/portable/IAR/ARM_CM3</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1956,6 +1960,27 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\include\sensor.h</name>
+    </file>
+  </group>
+  <group>
+    <name>mechanism</name>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\mechanism\mech_motor.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\mechanism\mech_motor.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\mechanism\mech_sensor.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\mechanism\mech_sensor.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\mechanism\mech_unit.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\mechanism\mech_unit.h</name>
     </file>
   </group>
   <group>
