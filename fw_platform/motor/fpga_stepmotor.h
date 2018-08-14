@@ -24,6 +24,7 @@ struct fpga_stepmotor_resource {
 	struct ramp_info *rampinfo;	// ramp table of supported speeds and speed-shifts
 	uint32_t fpga_irq_mask;			// motor interrupt bit mask
 	int fabric_irq;
+	int pullin_speed;
 };
 
 extern int fpga_stepmotor_install(struct steppermotor *motor);

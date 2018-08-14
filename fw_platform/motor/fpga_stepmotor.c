@@ -8,9 +8,11 @@
 #include "fpga_stepmotor.h"
 #include "fpga.h"
 #include "fpga_io.h"
+#include "fpgadrv.h"
 #include "steptable.h"
 #include "irqcallback.h"
 
+   
 #define SPEED_TO_COUNT(speed,stepping,clock)	(((1000000000L / (speed)) / (stepping)) / (clock))
 
 #define MOTOR_TABLE_RAMP_LIMIT		((void *)((uint32_t)motor_rc->ram_base + motor_rc->ram_ramp_offset + motor_rc->table_ramp_size))
@@ -26,7 +28,7 @@ static void fpga_stepmotor_irqcallback(void *device, int id, void *data)
 	int status;
 	
 	fpga_clear_interrupt(motor_rc->fpga_irq_mask);
-	status = fpga_stepmotor_status(motor);
+	status = _fpga_stepmotor_status(motor);
 	if(status == STEPPERMOTOR_RUNNING)
 	{
 		fpga_update_lbits((char *)motor_rc->mmio_base + FPGA_REG_MOTOR_CONTROL, FPGA_REG_MOTOR_RUN, 0);
@@ -98,15 +100,16 @@ static inline int _fpga_stepmotor_status(struct steppermotor *motor)
 	ret = 0;
 	return ret;
 }
+#else
+static inline int _fpga_stepmotor_status(struct steppermotor *motor)
+{
+  	return motor->status;
+}
 #endif
 
 static int fpga_stepmotor_status(struct steppermotor *motor)
 {
-	#if 0
 	return _fpga_stepmotor_status(motor);
-	#else
-	return motor->status;
-	#endif
 }
 
 
@@ -188,7 +191,7 @@ static inline void * fpga_ram_load_value(void *addr, uint32_t value)
 static int fpga_stepmotor_config(struct steppermotor *motor, const struct steppermotor_config *config)
 {
 	struct fpga_stepmotor_resource *motor_rc;
-    struct speed_info *speedinfo;
+	struct speed_info *speedinfo;
 	int ret, steps, speedlevel;
 	uint32_t val;
 
@@ -321,11 +324,11 @@ static struct steppermotor_ops fpga_stepmotor_ops = {
 	.get_running_steps = fpga_stepmotor_get_running_steps,
 };
 
-
 int fpga_stepmotor_install(struct steppermotor *motor)
 {
-	struct fpga_stepmotor_resource *stepmotor_resource = (struct fpga_stepmotor_resource *)motor->resource;
-		
+	struct fpga_stepmotor_resource *p_motor_rc = (struct fpga_stepmotor_resource *)motor->resource;
+	int j, ret=0;
+	
 	if (!motor)
 		return -1;
 	if (!motor->resource)
@@ -333,8 +336,31 @@ int fpga_stepmotor_install(struct steppermotor *motor)
 
 	motor->ops = &fpga_stepmotor_ops;
 
-	fabric_irqcallback_install(stepmotor_resource->fabric_irq, (irqcallback_t)fpga_stepmotor_irqcallback, (void *)motor);
-	return 0;
+	fabric_irqcallback_install(p_motor_rc->fabric_irq, (irqcallback_t)fpga_stepmotor_irqcallback, (void *)motor);
+
+	motor->feature.max_steps = MAXIMUM_STEPS / p_motor_rc->stepping; 
+	motor->feature.pullin_speed = p_motor_rc->pullin_speed;
+	motor->feature.num_speed = p_motor_rc->rampinfo->num_speed;
+		
+	for(j=0; j<motor->feature.num_speed; j++)
+	{
+		motor->feature.speeds[j].speed = p_motor_rc->rampinfo->speeds[j].accel_table->object_speed;
+		motor->feature.speeds[j].accel_steps = p_motor_rc->rampinfo->speeds[j].accel_table->ramp_size/p_motor_rc->rampinfo->speeds[j].accel_table->stepping;
+		motor->feature.speeds[j].decel_steps = p_motor_rc->rampinfo->speeds[j].decel_table->ramp_size/p_motor_rc->rampinfo->speeds[j].decel_table->stepping;
+		if(p_motor_rc->rampinfo->speeds[j].accel_table->ramp_size > p_motor_rc->ram_size)
+		{
+			return -1;
+		}
+		if(p_motor_rc->rampinfo->speeds[j].decel_table->ramp_size > p_motor_rc->ram_size)
+		{
+			return -1;
+		}
+	}
+		
+	ret = steppermotor_ramptable_convert(p_motor_rc->rampinfo, p_motor_rc->clock_period); 
+	
+	fpga_stepmotor_hw_init(motor);
+	return ret;
 }
 
 
