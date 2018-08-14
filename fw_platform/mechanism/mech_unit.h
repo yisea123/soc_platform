@@ -56,7 +56,7 @@ extern int32_t mechunit_get_sensor_feature(struct mechanism_uint_data *punit_dat
 extern int32_t mechunit_get_motor_feature(struct mechanism_uint_data *punit_data, mech_unit_motor_feature_t *pmech_unit_motor_feature);
 extern int32_t	mechunit_stop(struct mechanism_dev_t *mech_dev, mech_control_t *pmech_control);
 extern int32_t	mechunit_motor_move(struct mechanism_dev_t * mech_dev, mech_control_t *mech_control);
-extern int32_t	mechunit_pps(struct mechanism_dev_t * mech_dev, mech_control_t *pmech_control);
+extern int32_t	mechunit_sensor(struct mechanism_dev_t * mech_dev, mech_control_t *pmech_control);
 
 //-----mech_status--------------------------------------
 #define	IDLE			0	/* devices states	*/ 

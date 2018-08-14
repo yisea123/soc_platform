@@ -543,19 +543,19 @@ int32_t	mechunit_stop(struct mechanism_dev_t *mech_dev, mech_control_t *pmech_co
 	return 0;
 }
 
-int32_t	mechunit_pps(struct mechanism_dev_t * mech_dev, mech_control_t *pmech_control)
+int32_t	mechunit_sensor(struct mechanism_dev_t * mech_dev, mech_control_t *pmech_control)
 {
 	int32_t ret=0;
 
 	switch(MECHCTRL_MODE(pmech_control))
 	{
-	case PPS_ON:
+	case SENSOR_ON:
 		ret = sensor_enable(&mech_dev->mech_unit_data.unit_sensor_data, MECHCTRL_BUFFER(pmech_control), 1); 
 		break;
-	case PPS_OFF:
+	case SENSOR_OFF:
 		ret = sensor_enable(&mech_dev->mech_unit_data.unit_sensor_data, MECHCTRL_BUFFER(pmech_control), 0); 
 		break;
-	case PPS_SETCONFIG:
+	case SENSOR_SETCONFIG:
 		ret = sensor_set_config(&mech_dev->mech_unit_data.unit_sensor_data, &(mech_dev->mech_unit_control.mech_unit_sen_config), (sen_config_t *)MECHCTRL_BUFFER(pmech_control)); 
 		break;
 	default:

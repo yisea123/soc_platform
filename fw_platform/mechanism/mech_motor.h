@@ -37,9 +37,9 @@ static inline unsigned long wait_for_completion_timeout(struct completion *x, un
 {
   	while((!x->done)&&timeout)
 	{
-			vTaskDelay(1/ portTICK_RATE_MS);
-			if(timeout)
-				timeout--;					
+		vTaskDelay(1/ portTICK_RATE_MS);
+		if(timeout)
+			timeout--;					
 	}
 	if(!x->done)
 		return timeout;
