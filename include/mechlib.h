@@ -1,6 +1,8 @@
 #ifndef __MECHLIB_H__
 #define __MECHLIB_H__
 
+#include <stdint.h>
+
 /*export to application*/
 #define MOTOR_ERR_OPTIMIZE	1
 
