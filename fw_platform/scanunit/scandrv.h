@@ -26,6 +26,8 @@ extern void scanunit_set_scanning_mode(uint32_t mode);
 extern int scanunit_get_hwinfo(const struct scanunit_hwinfo *hwinfo);
 extern int scanunit_get_digitiser_config(int device, struct scanunit_config *config);
 extern int scanunit_set_digitiser_config(int device, const struct scanunit_config *config);
+extern int scanunit_get_digitiser_aux_config(int device, struct scanunit_config *config);
+extern int scanunit_set_digitiser_aux_config(int device, const struct scanunit_config *config);
 extern int scanunit_get_sensor_config(int device, struct scanunit_config *config);
 extern int scanunit_set_sensor_config(int device, const struct scanunit_config *config);
 extern int scanunit_get_sensor_common_config(struct scan_reg_config *regconfig);

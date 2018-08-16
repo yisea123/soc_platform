@@ -116,11 +116,41 @@ int scanunit_set_digitiser_config(int device, const struct scanunit_config *conf
 }
 
 
-int scanunit_get_sensor_config(int device, struct scanunit_config *config)
+int scanunit_get_digitiser_aux_config(int device, struct scanunit_config *config)
 {
 	int rs;
 
 	if (device < 0 || device >= scanner_hwinfo.digitisers) 
+		return -1;
+	if (config->regcount <= 0 || config->regconfig == NULL)
+		return -1;
+
+	rs = imagedigitiser_get_aux_config(&imagedigitiser_list[device], config);
+
+	return rs;
+}
+
+
+int scanunit_set_digitiser_aux_config(int device, const struct scanunit_config *config)
+{
+	int rs;
+
+	if (device < 0 || device >= scanner_hwinfo.digitisers)
+		return -1;
+	if (config->regcount <= 0 || config->regconfig == NULL)
+		return -1;
+
+	rs = imagedigitiser_set_aux_config(&imagedigitiser_list[device], config);
+
+	return rs;
+}
+
+
+int scanunit_get_sensor_config(int device, struct scanunit_config *config)
+{
+	int rs;
+
+	if (device < 0 || device >= scanner_hwinfo.digitisers)
 		return -1;
 	if (config->regcount <= 0 || config->regconfig == NULL)
 		return -1;
