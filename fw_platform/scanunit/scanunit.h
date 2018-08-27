@@ -56,5 +56,8 @@ struct scanunit_config {
 	struct scan_reg_config *regconfig;	// address of scanunit register configure block
 };
 
-
+struct scanunit_scanmode {
+	unsigned char dpimode;
+	unsigned char ledmode;
+};
 #endif /* __SCANUNIT_H__ */

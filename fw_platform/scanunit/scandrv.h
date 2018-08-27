@@ -22,7 +22,7 @@ extern void scanunit_start_scanning(void);
 extern void scanunit_stop_scanning(void);
 extern void scanunit_turnon_lights(void);
 extern void scanunit_turnoff_lights(void);
-extern void scanunit_set_scanning_mode(uint32_t mode);
+extern void scanunit_set_scanning_mode(struct scanunit_scanmode mode);
 extern int scanunit_get_scanlines(void);
 extern int scanunit_get_hwinfo(const struct scanunit_hwinfo *hwinfo);
 extern int scanunit_get_digitiser_config(int device, struct scanunit_config *config);

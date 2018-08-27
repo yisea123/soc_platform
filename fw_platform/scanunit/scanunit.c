@@ -71,9 +71,10 @@ void scanunit_turnoff_lights(void)
 }
 
 
-void scanunit_set_scanning_mode(uint32_t mode)
+void scanunit_set_scanning_mode(struct scanunit_scanmode mode)
 {
-	fpga_update_lbits((char *)scanctrl_reg_base + FPGA_REG_CIS_CONTROL, FPGA_REG_CIS_SCANMODE_MASK, mode);
+	fpga_update_lbits((char *)scanctrl_reg_base + FPGA_REG_CIS_CONTROL, FPGA_REG_CIS_SCANMODE_MASK, mode.ledmode);
+	fpga_writel(mode.dpimode, (char *)scanctrl_reg_base + FPGA_REG_CIS_DPI);
 }
 
 
