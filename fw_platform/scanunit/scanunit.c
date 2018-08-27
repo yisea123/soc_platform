@@ -31,14 +31,14 @@ static void scanunit_irqcallback(void *device, int id, void *data)
 
 void scanunit_reset(void)
 {
-	fpga_writel(0, scanctrl_reg_base + FPGA_REG_CIS_CONTROL);
+	fpga_writel(0, (char *)scanctrl_reg_base + FPGA_REG_CIS_CONTROL);
 	fpga_clear_interrupt(scan_int_mask);
 }
 
 
 void scanunit_set_timeout_value(unsigned int timeout)
 {
-	fpga_writel(timeout, scanctrl_reg_base + FPGA_REG_CIS_MAX_LIGHTON_TIME);
+	fpga_writel(timeout, (char *)scanctrl_reg_base + FPGA_REG_CIS_MAX_LIGHTON_TIME);
 }
 
 
@@ -47,33 +47,41 @@ void scanunit_start_scanning(void)
 	imagedigitiser_enable(imagedigitiser_get(0));
 	fpga_clear_interrupt(scan_int_mask);
 	fpga_enable_interrupt(scan_int_mask);
-	fpga_update_lbits(scanctrl_reg_base + FPGA_REG_CIS_CONTROL, FPGA_REG_CIS_SCAN_ENABLE, FPGA_REG_CIS_SCAN_ENABLE);
+	fpga_update_lbits((char *)scanctrl_reg_base + FPGA_REG_CIS_CONTROL, FPGA_REG_CIS_SCAN_ENABLE, FPGA_REG_CIS_SCAN_ENABLE);
 }
 
 
 void scanunit_stop_scanning(void)
 {
 	fpga_disable_interrupt(scan_int_mask);
-	fpga_update_lbits(scanctrl_reg_base + FPGA_REG_CIS_CONTROL, FPGA_REG_CIS_SCAN_ENABLE, 0);
+	fpga_update_lbits((char *)scanctrl_reg_base + FPGA_REG_CIS_CONTROL, FPGA_REG_CIS_SCAN_ENABLE, 0);
 	imagedigitiser_disable(imagedigitiser_get(0));
 }
 
 
 void scanunit_turnon_lights(void)
 {
-	fpga_update_lbits(scanctrl_reg_base + FPGA_REG_CIS_CONTROL, FPGA_REG_CIS_LEDS_ENABLE, FPGA_REG_CIS_LEDS_ENABLE);
+	fpga_update_lbits((char *)scanctrl_reg_base + FPGA_REG_CIS_CONTROL, FPGA_REG_CIS_LEDS_ENABLE, FPGA_REG_CIS_LEDS_ENABLE);
 }
 
 
 void scanunit_turnoff_lights(void)
 {
-	fpga_update_lbits(scanctrl_reg_base + FPGA_REG_CIS_CONTROL, FPGA_REG_CIS_LEDS_ENABLE, 0);
+	fpga_update_lbits((char *)scanctrl_reg_base + FPGA_REG_CIS_CONTROL, FPGA_REG_CIS_LEDS_ENABLE, 0);
 }
 
 
 void scanunit_set_scanning_mode(uint32_t mode)
 {
-	fpga_update_lbits(scanctrl_reg_base + FPGA_REG_CIS_CONTROL, FPGA_REG_CIS_SCANMODE_MASK, mode);
+	fpga_update_lbits((char *)scanctrl_reg_base + FPGA_REG_CIS_CONTROL, FPGA_REG_CIS_SCANMODE_MASK, mode);
+}
+
+
+int scanunit_get_scanlines(void)
+{
+	uint32_t val;
+	fpga_readl(&val, (char *)scanctrl_reg_base + FPGA_REG_CIS_SCANLINES);
+	return (int)val;
 }
 
 
@@ -183,7 +191,7 @@ int scanunit_get_sensor_common_config(struct scan_reg_config *regconfig)
 	if (!regconfig)
 		return -1;
 
-	fpga_readl(&value, scanctrl_reg_base + regconfig->address);
+	fpga_readl(&value, (char *)scanctrl_reg_base + regconfig->address);
 	regconfig->value = value & regconfig->mask;
 
 	return 0;
@@ -198,13 +206,13 @@ int scanunit_set_sensor_common_config(const struct scan_reg_config *regconfig)
 		return -1;
 
 	if (regconfig->mask != 0) {     // bit operation
-		fpga_readl(&value, scanctrl_reg_base + regconfig->address);
+		fpga_readl(&value, (char *)scanctrl_reg_base + regconfig->address);
 		value &= ~regconfig->mask;
 		value |= regconfig->value & regconfig->mask;
 	}
 	else
 		value = regconfig->value;
-	fpga_writel(value, scanctrl_reg_base + regconfig->address);
+	fpga_writel(value, (char *)scanctrl_reg_base + regconfig->address);
 
 	return 0;
 }
