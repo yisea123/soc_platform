@@ -322,6 +322,7 @@
           <state>$PROJ_DIR$/../../fw_platform</state>
           <state>$PROJ_DIR$/../../fw_platform/fpga</state>
           <state>$PROJ_DIR$/../../fw_platform/motor</state>
+          <state>$PROJ_DIR$/../../fw_platform/nvram</state>
           <state>$PROJ_DIR$/../../fw_platform/sensor</state>
           <state>$PROJ_DIR$/../../fw_platform/scanunit</state>
           <state>$PROJ_DIR$/../../FreeRTOS/include</state>
@@ -1292,6 +1293,7 @@
           <state>$PROJ_DIR$/../../fw_platform</state>
           <state>$PROJ_DIR$/../../fw_platform/fpga</state>
           <state>$PROJ_DIR$/../../fw_platform/motor</state>
+          <state>$PROJ_DIR$/../../fw_platform/nvram</state>
           <state>$PROJ_DIR$/../../fw_platform/sensor</state>
           <state>$PROJ_DIR$/../../fw_platform/scanunit</state>
           <state>$PROJ_DIR$/../../FreeRTOS/include</state>
@@ -2005,6 +2007,30 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\fw_platform\motor\steptable.h</name>
+    </file>
+  </group>
+  <group>
+    <name>nvram</name>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\at24cxx.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\at24cxx.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\nvmapi.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\nvram.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\nvram.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\socnvm.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\socnvm.h</name>
     </file>
   </group>
   <group>
