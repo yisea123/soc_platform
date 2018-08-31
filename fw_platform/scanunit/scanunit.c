@@ -159,7 +159,7 @@ int scanunit_get_sensor_config(int device, struct scanunit_config *config)
 {
 	int rs;
 
-	if (device < 0 || device >= scanner_hwinfo.digitisers)
+	if (device < 0 || device >= scanner_hwinfo.sensors)
 		return -1;
 	if (config->regcount <= 0 || config->regconfig == NULL)
 		return -1;
@@ -174,7 +174,7 @@ int scanunit_set_sensor_config(int device, const struct scanunit_config *config)
 {
 	int rs;
 
-	if (device < 0 || device >= scanner_hwinfo.digitisers) 
+	if (device < 0 || device >= scanner_hwinfo.sensors)
 		return -1;
 	if (config->regcount <= 0 || config->regconfig == NULL)
 		return -1;
