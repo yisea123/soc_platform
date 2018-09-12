@@ -1958,6 +1958,9 @@
       <name>$PROJ_DIR$\..\..\include\motor.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\include\nvmapi.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\include\pwm.h</name>
     </file>
     <file>
@@ -2079,6 +2082,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\fw_platform\sensor\photosensor.h</name>
+    </file>
+  </group>
+  <group>
+    <name>utility</name>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\utility\crc32.c</name>
     </file>
   </group>
   <file>
