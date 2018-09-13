@@ -16,8 +16,15 @@ static int nvmsect_num = 0;
 
 extern uint32_t crc32( const unsigned char *buf, uint32_t size);
 
-static int id_to_block_index(int id, nvram_block_t *block_table, int block_num);
 static int calc_offset(nvram_block_t *block_table, int block_num);
+
+static int id_to_index(int id);
+
+// macros to get section & block index from return value of function id_to_index.
+// return value: higher 16-bits = section index, lower 16-bits = block index
+#define RETVAL_INDEX(sect, blk)	((sect) << 16 + (blk))
+#define SECTION_INDEX(v)	((v) >> 16)
+#define BLOCK_INDEX(v)		((v) & 0xffff)
 
 
 int calc_offset(nvram_block_t *block_table, int block_num)
@@ -32,13 +39,14 @@ int calc_offset(nvram_block_t *block_table, int block_num)
 }
 
 
-int id_to_block_index(int id, nvram_block_t *block_table, int block_num)
+/* block ID to section and block index */
+int id_to_index(int id)
 {
-	int i;
-
-	for (i = 0; i < block_num; i++)
-		if (block_table[i].id == id)
-			return i;
+	int i, s;
+	for (s = 0; s < nvmsect_num; s++)
+		for (i = 0; i < nvmsect_table[s].blocks; i++)
+			if (nvmsect_table[s].nvmblock[i].id == id)
+				return RETVAL_INDEX(s, i);
 	return -1;
 }
 
@@ -153,10 +161,13 @@ int nvm_setdefault(int section)
 	nvmsect = &nvmsect_table[section];
 	nvmblock = nvmsect->nvmblock;
 	nvmdata = (nvram_data_t *)nvmsect->buffer;
-	for (i=0; i < nvmsect->blocks; i++) {
+	if (!nvmdata)
+		return -1;
+
+	for (i = 0; i < nvmsect->blocks; i++) {
 		uint8_t *dataptr = &(nvmdata->data[nvmblock[i].offset]);
 		if (nvmblock[i].info->defaultdata)
-			memcpy(dataptr, nvmblock[i].info->defaultdata, nvmdata->length);
+			memcpy(dataptr, nvmblock[i].info->defaultdata, nvmblock[i].info->length);
 	}
 	chksum = crc32(nvmdata->data, nvmdata->length);
 	if (chksum != nvmdata->checksum) {
@@ -171,21 +182,21 @@ int nvm_setdefault(int section)
 /*
  *  write data block to nvram
  */
-int nvm_write(int section, int block_id, void *buffer, int count)
+int nvm_write(int block_id, void *buffer, int count)
 {
 	nvram_control_t *nvmsect;
 	nvram_block_t *nvmblock;
 	nvram_data_t *nvmdata;
 	uint8_t *dataptr;
-	int index;
+	int index, section, val;
 
-	if (!nvmsect_table || section > nvmsect_num)
+	val = id_to_index(block_id);
+	if (val == -1)
 		return -1;
 
+	section = SECTION_INDEX(val);
+	index = BLOCK_INDEX(val);
 	nvmsect = &nvmsect_table[section];
-	index = id_to_block_index(block_id, nvmsect->nvmblock, nvmsect->blocks);
-	if (index == -1)
-		return -1;
 
 	nvmblock = &(nvmsect->nvmblock[index]);
 	if (count > nvmblock->info->length)
@@ -213,21 +224,21 @@ int nvm_write(int section, int block_id, void *buffer, int count)
 /*
  *  read data block from nvram
  */
-int nvm_read(int section, int block_id, void *buffer, int count)
+int nvm_read(int block_id, void *buffer, int count)
 {
 	nvram_control_t *nvmsect;
 	nvram_block_t *nvmblock;
 	nvram_data_t *nvmdata;
 	uint8_t *dataptr;
-	int index;
+	int index, section, val;
 
-	if (!nvmsect_table || section > nvmsect_num)
+	val = id_to_index(block_id);
+	if (val == -1)
 		return -1;
 
+	section = SECTION_INDEX(val);
+	index = BLOCK_INDEX(val);
 	nvmsect = &nvmsect_table[section];
-	index = id_to_block_index(block_id, nvmsect->nvmblock, nvmsect->blocks);
-	if (index == -1)
-		return -1;
 
 	nvmblock = &(nvmsect->nvmblock[index]);
 	if (count > nvmblock->info->length)

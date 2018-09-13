@@ -86,7 +86,7 @@ int nvm_initialize(int section);
 void nvm_release(void);
 void nvm_flush(void);
 int nvm_setdefault(int section);
-int nvm_write(int section, int block_id, void *buffer, int count);
-int nvm_read(int section, int block_id, void *buffer, int count);
+int nvm_write(int block_id, void *buffer, int count);
+int nvm_read(int block_id, void *buffer, int count);
 
 #endif /* __NVMAPI_H__ */
