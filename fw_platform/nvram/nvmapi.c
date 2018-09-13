@@ -22,7 +22,7 @@ static int id_to_index(int id);
 
 // macros to get section & block index from return value of function id_to_index.
 // return value: higher 16-bits = section index, lower 16-bits = block index
-#define RETVAL_INDEX(sect, blk)	((sect) << 16 + (blk))
+#define RETVAL_INDEX(sect, blk)	(((sect) << 16) + (blk))
 #define SECTION_INDEX(v)	((v) >> 16)
 #define BLOCK_INDEX(v)		((v) & 0xffff)
 
