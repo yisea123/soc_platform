@@ -2085,6 +2085,21 @@
     </file>
   </group>
   <group>
+    <name>usbd</name>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\usbd\mss_usb_device_vendor.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\usbd\mss_usb_device_vendor.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\usbd\usb_user_descriptors.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\usbd\usbd_driver.c</name>
+    </file>
+  </group>
+  <group>
     <name>utility</name>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\utility\crc32.c</name>
