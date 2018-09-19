@@ -23,10 +23,10 @@
 /* #define MSS_USB_OTG_PERIPHERAL_MODE*/
 
 /* Configures the MSS USB Driver Stack to operate in USB Host mode.*/
-   #define MSS_USB_OTG_HOST_MODE
+/* #define MSS_USB_OTG_HOST_MODE */
 
 /* Configures the MSS USB Driver Stack to operate in USB Device mode. */
-/* #define MSS_USB_PERIPHERAL_MODE */
+#define MSS_USB_PERIPHERAL_MODE
 
 /*Used for internal testing of the driver. Not for Application use*/
 /* #define MSS_USB_DEVICE_TEST_MODE */
