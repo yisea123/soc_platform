@@ -60,4 +60,11 @@ struct scanunit_scanmode {
 	unsigned char dpimode;
 	unsigned char ledmode;
 };
+
+typedef struct scanning_pixels_s
+{
+	unsigned int  scanmode;			// scanning mode
+	unsigned int scanpixels;		// scanning pixels
+} scanning_pixels_t;
+
 #endif /* __SCANUNIT_H__ */
