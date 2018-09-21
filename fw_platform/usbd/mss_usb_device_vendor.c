@@ -19,6 +19,7 @@
 #include "mss_usb_device.h"
 #include "mss_usb_std_def.h"
 #include "../../CMSIS/mss_assert.h"
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -102,7 +103,7 @@ static uint8_t g_bulk_tx_data[64] __attribute__ ((aligned (4))) = "Bulk Endpoint
 static uint8_t g_intr_tx_data[64] __attribute__ ((aligned (4))) = "Interrupt Endpoint data";
 
 static uint8_t g_req_rx_data[64] __attribute__ ((aligned (4))) = {0};
-static uint8_t g_bulk_rx_data[64] __attribute__ ((aligned (4))) = {0};
+static uint8_t g_bulk_rx_data[512] __attribute__ ((aligned (4))) = {0};
 static uint8_t g_intr_rx_data[64] __attribute__ ((aligned (4))) = {0};
 #elif defined(__ICCARM__)
 #pragma data_alignment = 4
@@ -111,7 +112,7 @@ static uint8_t g_bulk_tx_data[64]="Bulk Endpoint data";
 static uint8_t g_intr_tx_data[64]="Interrupt Endpoint data";
 
 static uint8_t g_req_rx_data[64]={0};
-static uint8_t g_bulk_rx_data[64]={0};
+static uint8_t g_bulk_rx_data[512]={0};
 static uint8_t g_intr_rx_data[64]={0};
 #elif defined(__CC_ARM)
 __align(4) static uint8_t g_req_tx_data[64] = "Example instruction data";
@@ -119,11 +120,11 @@ __align(4) static uint8_t g_bulk_tx_data[64]="Bulk Endpoint data";
 __align(4) static uint8_t g_intr_tx_data[64]="Interrupt Endpoint data";
 
 __align(4) static uint8_t g_req_rx_data[64]={0};
-__align(4) static uint8_t g_bulk_rx_data[64]={0};
+__align(4) static uint8_t g_bulk_rx_data[512]={0};
 __align(4) static uint8_t g_intr_rx_data[64]={0};
 #endif
 
-volatile int tx_completed, rx_completed, rxdata_count;
+volatile int tx_completed, rx_completed, rxdata_count, rxdata_index;
 extern mss_usb_ep_num_t vendor_tx_ep, vendor_rx_ep;
 
 
@@ -300,9 +301,9 @@ usbd_vendor_init_cb
                              MSS_USB_XFR_INTERRUPT,
                              NO_ZLP_TO_XFR);
 
-    MSS_USBD_rx_ep_read_prepare(VENDOR_INTR_RX_EP,
+/*    MSS_USBD_rx_ep_read_prepare(VENDOR_INTR_RX_EP,
                                 (uint8_t*)&g_intr_rx_data,
-                                sizeof(g_intr_rx_data));
+                                sizeof(g_intr_rx_data)); */
 
     MSS_USBD_tx_ep_configure(VENDOR_INTR_TX_EP,
                              VENDOR_INTR_TX_EP_FIFO_ADDR,
@@ -480,7 +481,8 @@ static uint8_t usbd_vendor_tx_complete_cb
 {
     if(status & (TX_EP_UNDER_RUN_ERROR | TX_EP_STALL_ERROR) )
     {
-        /* Take error mitigation action based on the error indication "status" */
+	tx_completed = 1;
+	/* Take error mitigation action based on the error indication "status" */
     }
     else
     {
@@ -521,6 +523,7 @@ usbd_vendor_rx_cb
         if (vendor_rx_ep == num)
         {
 		rxdata_count = rx_count;
+		rxdata_index = 0;
 		rx_completed = 1;
         }
         else
@@ -555,6 +558,19 @@ static uint8_t usbd_vendor_cep_rx_cb(uint8_t status)
 
     return USB_SUCCESS;
 }
+
+void usbd_rx_prepare(void)
+{
+	MSS_USBD_rx_ep_read_prepare(vendor_rx_ep,
+		(uint8_t*)&g_bulk_rx_data,
+		sizeof(g_bulk_rx_data));
+}
+
+void usbd_rx_datacopy(uint8_t* buf, uint32_t len)
+{
+	memcpy(buf, g_bulk_rx_data + rxdata_index, len);
+}
+
 #endif //MSS_USB_DEVICE_ENABLED
 
 #ifdef __cplusplus
