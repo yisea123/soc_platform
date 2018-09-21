@@ -10,7 +10,6 @@
 #include "../fpga.h"
 #include "fpgadrv.h"
 
-
 volatile uint32_t *ctrl_reg_base;
 volatile uint32_t *ints_reg_base;
 
@@ -20,6 +19,11 @@ uint32_t fpga_get_version(void)
 	uint32_t version;
 	fpga_readl(&version, (char *)ctrl_reg_base + FPGA_REG_VERSION);
 	return version;
+}
+
+void fpga_enable(uint32_t on_off)
+{
+	fpga_update_lbits((char *)ctrl_reg_base + FPGA_REG_ENABLE, 1, on_off);
 }
 
 static int  fpga_is_ready(void)

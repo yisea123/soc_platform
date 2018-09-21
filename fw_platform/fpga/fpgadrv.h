@@ -2,6 +2,7 @@
 #define __FPGADRV_H__
 
 #include <stdint.h>
+#include <stdbool.h>
 
 struct fpga_resource {
 	void *ctrl_reg_base;
@@ -16,5 +17,5 @@ extern uint32_t fpga_get_version(void);
 extern void fpga_enable_interrupt(uint32_t);
 extern void fpga_disable_interrupt(uint32_t);
 extern void fpga_clear_interrupt(uint32_t);
-
+extern void fpga_enable(uint32_t on_off);
 #endif
