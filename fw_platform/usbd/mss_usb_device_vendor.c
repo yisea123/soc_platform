@@ -89,6 +89,7 @@ static uint8_t usbd_vendor_process_request_cb(mss_usbd_setup_pkt_t* setup_pkt,
 
 static uint8_t usbd_vendor_cep_tx_complete_cb(uint8_t status);
 static uint8_t usbd_vendor_cep_rx_cb(uint8_t status);
+void usbd_rx_prepare(void);
 
 /*******************************************************************************
  Global variables used by USBD-VENDOR class driver.
@@ -524,8 +525,10 @@ usbd_vendor_rx_cb
         {
 		rxdata_count = rx_count;
 		rxdata_index = 0;
+		if (!rx_completed)
+			usbd_rx_prepare();
 		rx_completed = 1;
-        }
+	}
         else
         {
             ASSERT(0); /*Endpoint number not as per descriptors.*/

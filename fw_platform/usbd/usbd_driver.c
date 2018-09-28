@@ -32,19 +32,23 @@ int usbd_read(uint8_t* buf, uint32_t len)
 	int count = 0;
 	if(rxdata_count == 0)
 	{
-	        rx_completed = 0;
-                usbd_rx_prepare();
-		/*while (!rx_completed && timeout != 0 && rxdata_count == 0) {
+		if (!rx_completed)
+			usbd_rx_prepare();
+		while (!rx_completed && timeout != 0 && rxdata_count == 0) {
 			--timeout;
-		}*/
+		}
+		if (timeout == 0)
+			return -1;	// return -1 when timeout
 	}
 
 	if(rxdata_count > 0)
 	{
-	    count = (len < rxdata_count)? len: rxdata_count;
-	    usbd_rx_datacopy(buf, count);
-	    rxdata_count -= count;
-	    rxdata_index += count;
+		count = (len < rxdata_count)? len: rxdata_count;
+		usbd_rx_datacopy(buf, count);
+		rxdata_count -= count;
+		rxdata_index += count;
+		if (!rxdata_count)
+			rx_completed = 0;
 	}
 
 	return count;
