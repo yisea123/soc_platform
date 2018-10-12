@@ -1,68 +1,69 @@
+#include <stdio.h>
+
+#include "FreeRTOS.h"
+#include "semphr.h"
 
 #include "usbdrv.h"
 
+#include "mss_assert.h"
 #include "mss_usb_device_vendor.h"
+
+
+#define USBD_RX_TIMEOUT      (10*1000/portTICK_RATE_MS)
+#define USBD_TX_TIMEOUT      (20*1000/portTICK_RATE_MS)
 
 
 extern mss_usbd_user_descr_cb_t vendor_dev_descriptors_cb;
 
+int usb_online;
 mss_usb_ep_num_t vendor_tx_ep, vendor_rx_ep;
 
-extern volatile int tx_completed, rx_completed, rxdata_count, rxdata_index;
-extern void usbd_rx_prepare(void);
-extern void usbd_rx_datacopy(uint8_t* buf, uint32_t len);
+xSemaphoreHandle sem_usb_rxdata = NULL, sem_usb_txdone = NULL;
+
+extern volatile int tx_completed, rx_completed;
+extern volatile uint32_t rxdata_count;
+extern void usbd_rx_prepare(uint8_t* buf, uint32_t len);
+
 
 int usbd_write(const uint8_t* buf, uint32_t len)
 {
-	uint32_t timeout = 0xffffffff;
-	tx_completed = 0;
-	rxdata_count = 0;
+	/*Make sure that address is Modulo-4.Bits D0-D1 are read only.*/
+	ASSERT(!(((uint32_t)buf) & 0x00000002));
 
 	MSS_USBD_tx_ep_write(vendor_tx_ep, (uint8_t *)buf, len);
-	while (!tx_completed && timeout != 0) {
-		--timeout;
-	}
-	return timeout ? len : -1;
+	if (xSemaphoreTake(sem_usb_txdone, USBD_TX_TIMEOUT) == pdFALSE)
+		return -1;	// return -1 when timeout
+	return len;
 }
 
 
 int usbd_read(uint8_t* buf, uint32_t len)
 {
-	uint32_t timeout = 0xffffff;
-	int count = 0;
-	if(rxdata_count == 0)
-	{
-		if (!rx_completed)
-			usbd_rx_prepare();
-		while (!rx_completed && timeout != 0 && rxdata_count == 0) {
-			--timeout;
-		}
-		if (timeout == 0)
-			return -1;	// return -1 when timeout
-	}
+	/*Make sure that address is Modulo-4.Bits D0-D1 are read only.*/
+	ASSERT(!(((uint32_t)buf) & 0x00000002));
 
-	if(rxdata_count > 0)
-	{
-		count = (len < rxdata_count)? len: rxdata_count;
-		usbd_rx_datacopy(buf, count);
-		rxdata_count -= count;
-		rxdata_index += count;
-		if (!rxdata_count)
-			rx_completed = 0;
-	}
+	usbd_rx_prepare(buf, len);
+	if (xSemaphoreTake(sem_usb_rxdata, USBD_RX_TIMEOUT) == pdFALSE)
+		return -1;	// return -1 when timeout
 
-	return count;
+	return rxdata_count;
 }
 
 
 int usbd_install(const struct usbd_config *config)
 {
+	usb_online = 0;
 
 	vendor_rx_ep = MSS_USB_RX_EP_1;
 	vendor_tx_ep = MSS_USB_TX_EP_2;
+	tx_completed = 0;
 	rx_completed = 0;
 	rxdata_count = 0;
-	rxdata_index = 0;
+
+	vSemaphoreCreateBinary(sem_usb_rxdata);
+	vSemaphoreCreateBinary(sem_usb_txdone);
+	if (sem_usb_rxdata == NULL || sem_usb_txdone == NULL)
+		return -1;
 
 	/* Initialize USB driver. */
 	MSS_USBD_init(MSS_USB_DEVICE_HS);

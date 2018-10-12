@@ -20,6 +20,11 @@
 #include "mss_usb_std_def.h"
 #include "../../CMSIS/mss_assert.h"
 #include <string.h>
+#include <stdio.h>
+
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,7 +44,7 @@ extern "C" {
 
 /*Values should be same as described in ep descriptors*/
 #define VENDOR_TX_EP_MAX_PKT_SIZE_HS                      512
-#define VENDOR_RX_EP_MAX_PKT_SIZE_HS                      512
+#define VENDOR_RX_EP_MAX_PKT_SIZE_HS                      64
 
 /*LS Operation values*/
 #define VENDOR_TX_EP_FIFO_SIZE_FS                         64
@@ -89,7 +94,7 @@ static uint8_t usbd_vendor_process_request_cb(mss_usbd_setup_pkt_t* setup_pkt,
 
 static uint8_t usbd_vendor_cep_tx_complete_cb(uint8_t status);
 static uint8_t usbd_vendor_cep_rx_cb(uint8_t status);
-void usbd_rx_prepare(void);
+void usbd_rx_prepare(uint8_t *buffer, uint32_t len);
 
 /*******************************************************************************
  Global variables used by USBD-VENDOR class driver.
@@ -113,7 +118,7 @@ static uint8_t g_bulk_tx_data[64]="Bulk Endpoint data";
 static uint8_t g_intr_tx_data[64]="Interrupt Endpoint data";
 
 static uint8_t g_req_rx_data[64]={0};
-static uint8_t g_bulk_rx_data[512]={0};
+static uint8_t g_bulk_rx_data[64]={0};
 static uint8_t g_intr_rx_data[64]={0};
 #elif defined(__CC_ARM)
 __align(4) static uint8_t g_req_tx_data[64] = "Example instruction data";
@@ -121,13 +126,18 @@ __align(4) static uint8_t g_bulk_tx_data[64]="Bulk Endpoint data";
 __align(4) static uint8_t g_intr_tx_data[64]="Interrupt Endpoint data";
 
 __align(4) static uint8_t g_req_rx_data[64]={0};
-__align(4) static uint8_t g_bulk_rx_data[512]={0};
+__align(4) static uint8_t g_bulk_rx_data[64]={0};
 __align(4) static uint8_t g_intr_rx_data[64]={0};
 #endif
 
-volatile int tx_completed, rx_completed, rxdata_count, rxdata_index;
+static uint8_t *rxbuffer = g_bulk_rx_data;
+static uint32_t rxbuflen = sizeof(g_bulk_rx_data);
+
+volatile int tx_completed, rx_completed;
+volatile uint32_t rxdata_count;
 extern mss_usb_ep_num_t vendor_tx_ep, vendor_rx_ep;
 
+extern xSemaphoreHandle sem_usb_rxdata, sem_usb_txdone;
 
 mss_usbd_class_cb_t usb_vendor_class_cb = {usbd_vendor_init_cb,
                                            0,
@@ -233,8 +243,8 @@ uint8_t vendor_hs_conf_descr[FULL_CONFIG_DESCR_LENGTH] =
     USB_ENDPOINT_DESCRIPTOR_TYPE,                   /* bDescriptorType */
     VENDOR_BULK_RX_EP,                             /* bEndpointAddress */
     0x02u,                                          /* bmAttributes -- Bulk */
-    0x00u,                                          /* wMaxPacketSize LSB *///29
-    0x02u,                                          /* wMaxPacketSize MSB *///30
+    0x40u,                                          /* wMaxPacketSize LSB *///29
+    0x00u,                                          /* wMaxPacketSize MSB *///30
     0xFFu                                           /* bInterval */ /*Max NAK rate*/
 };
 
@@ -292,31 +302,8 @@ usbd_vendor_init_cb
     {
         ASSERT(0);
     }
-    MSS_USBD_rx_ep_configure(VENDOR_INTR_RX_EP,
-                             VENDOR_INTR_RX_EP_FIFO_ADDR,
-                             VENDOR_INTR_RX_EP_FIFO_SIZE,
-                             VENDOR_INTR_RX_EP_MAX_PKT_SIZE,
-                             1u,
-                             DMA_ENABLE,
-                             MSS_USB_DMA_CHANNEL1,
-                             MSS_USB_XFR_INTERRUPT,
-                             NO_ZLP_TO_XFR);
 
-/*    MSS_USBD_rx_ep_read_prepare(VENDOR_INTR_RX_EP,
-                                (uint8_t*)&g_intr_rx_data,
-                                sizeof(g_intr_rx_data)); */
-
-    MSS_USBD_tx_ep_configure(VENDOR_INTR_TX_EP,
-                             VENDOR_INTR_TX_EP_FIFO_ADDR,
-                             VENDOR_INTR_TX_EP_FIFO_SIZE,
-                             VENDOR_INTR_TX_EP_MAX_PKT_SIZE,
-                             1u,
-                             DMA_ENABLE,
-                             MSS_USB_DMA_CHANNEL2,
-                             MSS_USB_XFR_INTERRUPT,
-                             NO_ZLP_TO_XFR);
-
-    MSS_USBD_rx_ep_configure(VENDOR_BULK_RX_EP,
+    MSS_USBD_rx_ep_configure(vendor_rx_ep,
                              VENDOR_BULK_RX_EP_FIFO_ADDR,
                              bulk_rxep_fifo_sz,
                              bulk_rxep_maxpktsz,
@@ -326,11 +313,9 @@ usbd_vendor_init_cb
                              MSS_USB_XFR_BULK,
                              NO_ZLP_TO_XFR);
 
-    MSS_USBD_rx_ep_read_prepare(VENDOR_BULK_RX_EP,
-                                (uint8_t*)&g_bulk_rx_data,
-                                sizeof(g_bulk_rx_data));
+    MSS_USBD_rx_ep_read_prepare(VENDOR_BULK_RX_EP, rxbuffer, rxbuflen);
 
-    MSS_USBD_tx_ep_configure(VENDOR_BULK_TX_EP,
+    MSS_USBD_tx_ep_configure(vendor_tx_ep,
                              VENDOR_BULK_TX_EP_FIFO_ADDR,
                              bulk_txep_fifo_sz,
                              bulk_txep_maxpktsz,
@@ -489,7 +474,13 @@ static uint8_t usbd_vendor_tx_complete_cb
     {
         if (vendor_tx_ep == num)
         {
-		tx_completed = 1;
+            long high_pri_task_woken;
+
+            xSemaphoreGiveFromISR(sem_usb_txdone, &high_pri_task_woken);
+            if (high_pri_task_woken)
+                taskYIELD();
+
+            tx_completed = 1;
         }
         else
         {
@@ -521,14 +512,16 @@ usbd_vendor_rx_cb
     }
     else
     {
-        if (vendor_rx_ep == num)
+        if (vendor_rx_ep == num && rx_count > 0)
         {
-		rxdata_count = rx_count;
-		rxdata_index = 0;
-		if (!rx_completed)
-			usbd_rx_prepare();
-		rx_completed = 1;
-	}
+            long high_pri_task_woken;
+
+            rxdata_count = rx_count;
+
+            xSemaphoreGiveFromISR(sem_usb_rxdata, &high_pri_task_woken);
+            if (high_pri_task_woken)
+                taskYIELD();
+        }
         else
         {
             ASSERT(0); /*Endpoint number not as per descriptors.*/
@@ -562,16 +555,12 @@ static uint8_t usbd_vendor_cep_rx_cb(uint8_t status)
     return USB_SUCCESS;
 }
 
-void usbd_rx_prepare(void)
+void usbd_rx_prepare(uint8_t* buf, uint32_t len)
 {
-	MSS_USBD_rx_ep_read_prepare(vendor_rx_ep,
-		(uint8_t*)&g_bulk_rx_data,
-		sizeof(g_bulk_rx_data));
-}
-
-void usbd_rx_datacopy(uint8_t* buf, uint32_t len)
-{
-	memcpy(buf, g_bulk_rx_data + rxdata_index, len);
+    rxbuffer = buf;
+    rxbuflen = len;
+    rxdata_count = 0;
+    MSS_USBD_rx_ep_read_prepare(vendor_rx_ep, rxbuffer, rxbuflen);
 }
 
 #endif //MSS_USB_DEVICE_ENABLED
