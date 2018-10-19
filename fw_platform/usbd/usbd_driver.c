@@ -9,8 +9,8 @@
 #include "mss_usb_device_vendor.h"
 
 
-#define USBD_RX_TIMEOUT      (10*1000/portTICK_RATE_MS)
-#define USBD_TX_TIMEOUT      (20*1000/portTICK_RATE_MS)
+#define USBD_RX_TIMEOUT      (60*1000/portTICK_RATE_MS)
+#define USBD_TX_TIMEOUT      (10*1000/portTICK_RATE_MS)
 
 
 extern mss_usbd_user_descr_cb_t vendor_dev_descriptors_cb;
@@ -29,7 +29,7 @@ int usbd_write(const uint8_t* buf, uint32_t len)
 {
 	/*Make sure that address is Modulo-4.Bits D0-D1 are read only.*/
 	ASSERT(!(((uint32_t)buf) & 0x00000002));
-
+	tx_completed = 0;
 	MSS_USBD_tx_ep_write(vendor_tx_ep, (uint8_t *)buf, len);
 	if (xSemaphoreTake(sem_usb_txdone, USBD_TX_TIMEOUT) == pdFALSE)
 		return -1;	// return -1 when timeout

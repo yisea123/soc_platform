@@ -474,12 +474,6 @@ static uint8_t usbd_vendor_tx_complete_cb
     {
         if (vendor_tx_ep == num)
         {
-            long high_pri_task_woken;
-
-            xSemaphoreGiveFromISR(sem_usb_txdone, &high_pri_task_woken);
-            if (high_pri_task_woken)
-                taskYIELD();
-
             tx_completed = 1;
         }
         else
@@ -487,7 +481,14 @@ static uint8_t usbd_vendor_tx_complete_cb
             ASSERT(0); /*Endpoint number not as per descriptors.*/
         }
     }
+    if (tx_completed)
+    {
+        long high_pri_task_woken;
 
+        xSemaphoreGiveFromISR(sem_usb_txdone, &high_pri_task_woken);
+        if (high_pri_task_woken)
+            taskYIELD();
+    }
     return USB_SUCCESS;
 }
 
