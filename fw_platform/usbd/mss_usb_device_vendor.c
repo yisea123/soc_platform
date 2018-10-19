@@ -25,6 +25,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#define LOGGING
+#include "debug.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -94,7 +96,7 @@ static uint8_t usbd_vendor_process_request_cb(mss_usbd_setup_pkt_t* setup_pkt,
 
 static uint8_t usbd_vendor_cep_tx_complete_cb(uint8_t status);
 static uint8_t usbd_vendor_cep_rx_cb(uint8_t status);
-void usbd_rx_prepare(uint8_t *buffer, uint32_t len);
+extern uint32_t usbd_receive_data(uint8_t *buffer, uint32_t len);
 
 /*******************************************************************************
  Global variables used by USBD-VENDOR class driver.
@@ -130,11 +132,9 @@ __align(4) static uint8_t g_bulk_rx_data[64]={0};
 __align(4) static uint8_t g_intr_rx_data[64]={0};
 #endif
 
-static uint8_t *rxbuffer = g_bulk_rx_data;
-static uint32_t rxbuflen = sizeof(g_bulk_rx_data);
 
 volatile int tx_completed, rx_completed;
-volatile uint32_t rxdata_count;
+
 extern mss_usb_ep_num_t vendor_tx_ep, vendor_rx_ep;
 
 extern xSemaphoreHandle sem_usb_rxdata, sem_usb_txdone;
@@ -313,7 +313,7 @@ usbd_vendor_init_cb
                              MSS_USB_XFR_BULK,
                              NO_ZLP_TO_XFR);
 
-    MSS_USBD_rx_ep_read_prepare(VENDOR_BULK_RX_EP, rxbuffer, rxbuflen);
+    MSS_USBD_rx_ep_read_prepare(VENDOR_BULK_RX_EP, g_bulk_rx_data, sizeof(g_bulk_rx_data));
 
     MSS_USBD_tx_ep_configure(vendor_tx_ep,
                              VENDOR_BULK_TX_EP_FIFO_ADDR,
@@ -467,8 +467,8 @@ static uint8_t usbd_vendor_tx_complete_cb
 {
     if(status & (TX_EP_UNDER_RUN_ERROR | TX_EP_STALL_ERROR) )
     {
-	tx_completed = 1;
-	/* Take error mitigation action based on the error indication "status" */
+        tx_completed = 1;
+        /* Take error mitigation action based on the error indication "status" */
     }
     else
     {
@@ -513,12 +513,16 @@ usbd_vendor_rx_cb
     }
     else
     {
-        if (vendor_rx_ep == num && rx_count > 0)
+        if (vendor_rx_ep == num)
         {
             long high_pri_task_woken;
 
-            rxdata_count = rx_count;
+            MSS_USBD_rx_ep_read_prepare(vendor_rx_ep, g_bulk_rx_data, sizeof(g_bulk_rx_data));
 
+            if (rx_count == 0)
+                return USB_SUCCESS;
+
+            usbd_receive_data(g_bulk_rx_data, rx_count);
             xSemaphoreGiveFromISR(sem_usb_rxdata, &high_pri_task_woken);
             if (high_pri_task_woken)
                 taskYIELD();
@@ -554,14 +558,6 @@ static uint8_t usbd_vendor_cep_rx_cb(uint8_t status)
      */
 
     return USB_SUCCESS;
-}
-
-void usbd_rx_prepare(uint8_t* buf, uint32_t len)
-{
-    rxbuffer = buf;
-    rxbuflen = len;
-    rxdata_count = 0;
-    MSS_USBD_rx_ep_read_prepare(vendor_rx_ep, rxbuffer, rxbuflen);
 }
 
 #endif //MSS_USB_DEVICE_ENABLED
