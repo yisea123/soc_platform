@@ -145,7 +145,7 @@ static inline void  * fpga_ram_load_ramptable(void *addr, void *limit, uint32_t 
 	void  *ptr = addr;
 	int32_t i;
 	uint32_t val, val1;
-	dec_ramp_attr_t dec_ramp_attr = (dec_ramp_attr_t)(flag & 0x0f);
+	dec_ramp_attr_t dec_ramp_attr = speedtable->dec_ramp_attr;
 
 	flag &= ~0x0f;
 		
