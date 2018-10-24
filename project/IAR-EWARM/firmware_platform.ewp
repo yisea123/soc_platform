@@ -1950,6 +1950,15 @@
     </file>
   </group>
   <group>
+    <name>gpiokey</name>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\gpiokey\gpiokey.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\gpiokey\gpiokey.h</name>
+    </file>
+  </group>
+  <group>
     <name>include</name>
     <file>
       <name>$PROJ_DIR$\..\..\include\irqcallback.h</name>
