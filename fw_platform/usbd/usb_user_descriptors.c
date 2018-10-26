@@ -57,8 +57,8 @@ uint8_t device_descriptor[USB_STD_DEVICE_DESCR_LEN] =
     0x00u,                                              /* bcdUSB LSB */
     0x02u,                                              /* bcdUSB MSB */
     0xFFu,                                              /* bDeviceClass */
-    0xFFu,                                              /* bDeviceSubClass */
-    0xFFu,                                              /* bDeviceProtocol */
+    0x00u,                                              /* bDeviceSubClass */
+    0x00u,                                              /* bDeviceProtocol */
     0x40u,                                              /* bMaxPacketSize0 */
     0xBEu,                                              /* idVendor LSB */
     0x1Cu,                                              /* idVendor MSB */
@@ -82,8 +82,8 @@ uint8_t hs_dev_qualifier_descriptor[USB_STD_DEV_QUAL_DESCR_LENGTH] =
     0x00u,                                              /* bcdUSB LSB */
     0x02u,                                              /* bcdUSB MSB */
     0xFFu,                                              /* bDeviceClass */
-    0xFFu,                                              /* bDeviceSubClass */
-    0xFFu,                                              /* bDeviceProtocol */
+    0x00u,                                              /* bDeviceSubClass */
+    0x00u,                                              /* bDeviceProtocol */
     0x40u,                                              /* bMaxPacketSize0 */
     0x01u,                                              /* bNumConfigurations */
     0x00u                                               /* Reserved */
@@ -96,8 +96,8 @@ uint8_t fs_dev_qualifier_descriptor[USB_STD_DEV_QUAL_DESCR_LENGTH] =
     0x00u,                                              /* bcdUSB LSB */
     0x02u,                                              /* bcdUSB MSB */
     0xFFu,                                              /* bDeviceClass */
-    0xFFu,                                              /* bDeviceSubClass */
-    0xFFu,                                              /* bDeviceProtocol */
+    0x00u,                                              /* bDeviceSubClass */
+    0x00u,                                              /* bDeviceProtocol */
     0x40u,                                              /* bMaxPacketSize0 */
     0x01u,                                              /* bNumConfigurations */
     0x00u                                               /* Reserved */

@@ -57,13 +57,17 @@ extern "C" {
 #define VENDOR_RX_EP_MAX_PKT_SIZE_FS                      64
 
 /* Full configuration descriptor length*/
-#define FULL_CONFIG_DESCR_LENGTH                    (USB_STD_CONFIG_DESCR_LEN + \
-                                                     USB_STD_INTERFACE_DESCR_LEN + \
-                                                     USB_STD_ENDPOINT_DESCR_LEN + \
-                                                     USB_STD_ENDPOINT_DESCR_LEN + \
-                                                     USB_STD_ENDPOINT_DESCR_LEN + \
-                                                     USB_STD_ENDPOINT_DESCR_LEN )
+#define FULL_CONFIG_DESCR_LENGTH_FS			(USB_STD_CONFIG_DESCR_LEN +\
+							USB_STD_INTERFACE_DESCR_LEN +\
+							USB_STD_ENDPOINT_DESCR_LEN +\
+							USB_STD_ENDPOINT_DESCR_LEN +\
+							USB_STD_ENDPOINT_DESCR_LEN +\
+							USB_STD_ENDPOINT_DESCR_LEN )
 
+#define FULL_CONFIG_DESCR_LENGTH_HS			(USB_STD_CONFIG_DESCR_LEN +\
+							USB_STD_INTERFACE_DESCR_LEN +\
+							USB_STD_ENDPOINT_DESCR_LEN +\
+							USB_STD_ENDPOINT_DESCR_LEN )
 #define VENDOR_CONF_DESCR_DESCTYPE_IDX                    1u
 
 #define VENDOR_INTR_RX_EP_FIFO_ADDR                       0x100u
@@ -148,12 +152,12 @@ mss_usbd_class_cb_t usb_vendor_class_cb = {usbd_vendor_init_cb,
                                            usbd_vendor_cep_tx_complete_cb,
                                            usbd_vendor_cep_rx_cb };
 
-uint8_t vendor_fs_conf_descr[FULL_CONFIG_DESCR_LENGTH] =
+uint8_t vendor_fs_conf_descr[FULL_CONFIG_DESCR_LENGTH_FS] =
 {
     /*----------------------- Configuration Descriptor -----------------------*/
     USB_STD_CONFIG_DESCR_LEN,                       /* bLength */
     USB_CONFIGURATION_DESCRIPTOR_TYPE,              /* bDescriptorType */
-    FULL_CONFIG_DESCR_LENGTH,                       /* wTotalLength LSB */
+    FULL_CONFIG_DESCR_LENGTH_FS,                       /* wTotalLength LSB */
     0x00u,                                          /* wTotalLength MSB */
     0x01u,                                          /* bNumInterfaces */
     0x01u,                                          /* bConfigurationValue */
@@ -167,8 +171,8 @@ uint8_t vendor_fs_conf_descr[FULL_CONFIG_DESCR_LENGTH] =
     0x00u,                                          /* bAlternateSetting */
     0x04u,                                          /* bNumEndpoints */
     0xFFu,                                          /* bInterfaceClass */
-    0xFFu,                                          /* bInterfaceSubClass */
-    0xFFu,                                          /* bInterfaceProtocol */
+    0x00u,                                          /* bInterfaceSubClass */
+    0x00u,                                          /* bInterfaceProtocol */
     0x05u,                                          /* bInterface */
     /*------------------------- Interrupt IN Endpoint Descriptor --------------------------*/
     USB_STD_ENDPOINT_DESCR_LEN,                     /* bLength */
@@ -208,12 +212,12 @@ uint8_t vendor_fs_conf_descr[FULL_CONFIG_DESCR_LENGTH] =
  Configuration descriptor and sub-ordinate descriptors to enumerate the USB device
  as Mass Storage class Device by host.
  */
-uint8_t vendor_hs_conf_descr[FULL_CONFIG_DESCR_LENGTH] =
+uint8_t vendor_hs_conf_descr[FULL_CONFIG_DESCR_LENGTH_HS] =
 {
     /*----------------------- Configuration Descriptor -----------------------*/
     USB_STD_CONFIG_DESCR_LEN,                       /* bLength */
     USB_CONFIGURATION_DESCRIPTOR_TYPE,              /* bDescriptorType */
-    FULL_CONFIG_DESCR_LENGTH,                       /* wTotalLength LSB */
+    FULL_CONFIG_DESCR_LENGTH_HS,                       /* wTotalLength LSB */
     0x00u,                                          /* wTotalLength MSB */
     0x01u,                                          /* bNumInterfaces */
     0x01u,                                          /* bConfigurationValue */
@@ -237,7 +241,7 @@ uint8_t vendor_hs_conf_descr[FULL_CONFIG_DESCR_LENGTH] =
     0x02u,                                          /* bmAttributes --Bulk */
     0x00u,                                          /* wMaxPacketSize LSB */ //22
     0x02u,                                          /* wMaxPacketSize MSB */ //23
-    0xFFu,                                          /* bInterval *///ignored by host for Bulk IN EP
+    0x00u,                                          /* bInterval *///ignored by host for Bulk IN EP
     /*------------------------- Bulk  Endpoint Descriptor --------------------------*/
     USB_STD_ENDPOINT_DESCR_LEN,                     /* bLength */
     USB_ENDPOINT_DESCRIPTOR_TYPE,                   /* bDescriptorType */
@@ -245,7 +249,7 @@ uint8_t vendor_hs_conf_descr[FULL_CONFIG_DESCR_LENGTH] =
     0x02u,                                          /* bmAttributes -- Bulk */
     0x40u,                                          /* wMaxPacketSize LSB *///29
     0x00u,                                          /* wMaxPacketSize MSB *///30
-    0xFFu                                           /* bInterval */ /*Max NAK rate*/
+    0x00u                                           /* bInterval */ /*Max NAK rate*/
 };
 
 void
