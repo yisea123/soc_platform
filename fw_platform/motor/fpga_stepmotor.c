@@ -65,7 +65,7 @@ static void fpga_stepmotor_stop(struct steppermotor *motor)
 		return;
 
 	motor_rc = (struct fpga_stepmotor_resource *)motor->resource;
-	fpga_update_lbits((char *)motor_rc->mmio_base + FPGA_REG_MOTOR_CONTROL, FPGA_REG_MOTOR_RUN|FPGA_REG_MOTOR_STOP|FPGA_REG_MOTOR_EMERGENCY_BRAKE, FPGA_REG_MOTOR_STOP);
+	fpga_update_lbits((char *)motor_rc->mmio_base + FPGA_REG_MOTOR_CONTROL, FPGA_REG_MOTOR_RUN|FPGA_REG_MOTOR_STOP, FPGA_REG_MOTOR_STOP);
 }
 
 
