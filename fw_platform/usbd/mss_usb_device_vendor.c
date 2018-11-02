@@ -124,7 +124,7 @@ static uint8_t g_bulk_tx_data[64]="Bulk Endpoint data";
 static uint8_t g_intr_tx_data[64]="Interrupt Endpoint data";
 
 static uint8_t g_req_rx_data[64]={0};
-static uint8_t g_bulk_rx_data[64]={0};
+static uint8_t g_bulk_rx_data[512]={0};
 static uint8_t g_intr_rx_data[64]={0};
 #elif defined(__CC_ARM)
 __align(4) static uint8_t g_req_tx_data[64] = "Example instruction data";
@@ -132,7 +132,7 @@ __align(4) static uint8_t g_bulk_tx_data[64]="Bulk Endpoint data";
 __align(4) static uint8_t g_intr_tx_data[64]="Interrupt Endpoint data";
 
 __align(4) static uint8_t g_req_rx_data[64]={0};
-__align(4) static uint8_t g_bulk_rx_data[64]={0};
+__align(4) static uint8_t g_bulk_rx_data[512]={0};
 __align(4) static uint8_t g_intr_rx_data[64]={0};
 #endif
 
@@ -252,6 +252,12 @@ uint8_t vendor_hs_conf_descr[FULL_CONFIG_DESCR_LENGTH_HS] =
     0x00u                                           /* bInterval */ /*Max NAK rate*/
 };
 
+
+void usbd_rx_prepare(void)
+{
+    MSS_USBD_rx_ep_read_prepare(vendor_rx_ep, g_bulk_rx_data, sizeof(g_bulk_rx_data));
+}
+
 void
 MSS_USBD_VENDOR_init
 (
@@ -317,7 +323,7 @@ usbd_vendor_init_cb
                              MSS_USB_XFR_BULK,
                              NO_ZLP_TO_XFR);
 
-    MSS_USBD_rx_ep_read_prepare(VENDOR_BULK_RX_EP, g_bulk_rx_data, sizeof(g_bulk_rx_data));
+    usbd_rx_prepare();
 
     MSS_USBD_tx_ep_configure(vendor_tx_ep,
                              VENDOR_BULK_TX_EP_FIFO_ADDR,
@@ -492,6 +498,7 @@ static uint8_t usbd_vendor_tx_complete_cb
         xSemaphoreGiveFromISR(sem_usb_txdone, &high_pri_task_woken);
         if (high_pri_task_woken)
             taskYIELD();
+        usbd_rx_prepare();
     }
     return USB_SUCCESS;
 }
@@ -521,15 +528,15 @@ usbd_vendor_rx_cb
         {
             long high_pri_task_woken;
 
-            MSS_USBD_rx_ep_read_prepare(vendor_rx_ep, g_bulk_rx_data, sizeof(g_bulk_rx_data));
-
-            if (rx_count == 0)
-                return USB_SUCCESS;
-
-            usbd_receive_data(g_bulk_rx_data, rx_count);
-            xSemaphoreGiveFromISR(sem_usb_rxdata, &high_pri_task_woken);
-            if (high_pri_task_woken)
-                taskYIELD();
+            if (rx_count != 0)
+            {
+                usbd_receive_data(g_bulk_rx_data, rx_count);
+                xSemaphoreGiveFromISR(sem_usb_rxdata, &high_pri_task_woken);
+                if (high_pri_task_woken)
+                    taskYIELD();
+            }
+            if (rx_count == sizeof(g_bulk_rx_data))
+                usbd_rx_prepare();
         }
         else
         {

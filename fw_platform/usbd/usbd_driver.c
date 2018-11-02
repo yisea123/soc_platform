@@ -10,8 +10,8 @@
 #include "mss_usb_device_vendor.h"
 
 
-#define USBD_RX_TIMEOUT      (60*1000/portTICK_RATE_MS)
-#define USBD_TX_TIMEOUT      (10*1000/portTICK_RATE_MS)
+#define USBD_RX_TIMEOUT      (2*1000/portTICK_RATE_MS)
+#define USBD_TX_TIMEOUT      (2*1000/portTICK_RATE_MS)
 
 
 extern mss_usbd_user_descr_cb_t vendor_dev_descriptors_cb;
@@ -27,7 +27,7 @@ int rx_put_index, rx_get_index;
 volatile uint32_t rxdata_count;
 
 extern volatile int tx_completed, rx_completed;
-extern void usbd_rx_prepare(uint8_t* buf, uint32_t len);
+extern void usbd_rx_prepare(void);
 
 void usbd_rxdata_reset()
 {
@@ -77,6 +77,10 @@ int usbd_read(uint8_t* buf, uint32_t len)
 
 	while (rxdata_count == 0)
 	{
+		taskENTER_CRITICAL();
+		usbd_rx_prepare();
+		taskEXIT_CRITICAL();
+
 		if (xSemaphoreTake(sem_usb_rxdata, USBD_RX_TIMEOUT) == pdFALSE && rxdata_count == 0)
 			return -1;	// return -1 when timeout
 	}
