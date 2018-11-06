@@ -203,6 +203,13 @@ int steppermotor_get_running_steps(struct steppermotor *motor)
 	return -1;
 }
 
+int steppermotor_set_running_steps(struct steppermotor *motor, int steps)
+{
+	if (motor && motor->ops->set_running_steps)
+		return motor->ops->set_running_steps(motor, steps);
+
+	return -1;
+}
 
 int steppermotor_get_config(struct steppermotor *motor, struct steppermotor_config *config)
 {

@@ -99,6 +99,7 @@ struct motor_data{
     unsigned long stoping_status;
     int err_status;
     motor_callback_t callback;
+    int steps_to_stop;
 };
 
 typedef struct {

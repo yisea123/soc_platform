@@ -65,7 +65,7 @@ static void fpga_stepmotor_stop(struct steppermotor *motor)
 		return;
 
 	motor_rc = (struct fpga_stepmotor_resource *)motor->resource;
-	fpga_update_lbits((char *)motor_rc->mmio_base + FPGA_REG_MOTOR_CONTROL, FPGA_REG_MOTOR_RUN|FPGA_REG_MOTOR_STOP, FPGA_REG_MOTOR_STOP);
+	fpga_update_lbits((char *)motor_rc->mmio_base + FPGA_REG_MOTOR_CONTROL, FPGA_REG_MOTOR_RUN|FPGA_REG_MOTOR_STOP|FPGA_REG_MOTOR_EMERGENCY_BRAKE, FPGA_REG_MOTOR_STOP);
 }
 
 
@@ -78,9 +78,6 @@ static void fpga_stepmotor_emergencybrake(struct steppermotor *motor)
 
 	motor_rc = (struct fpga_stepmotor_resource *)motor->resource;
 	fpga_update_lbits((char *)motor_rc->mmio_base + FPGA_REG_MOTOR_CONTROL, FPGA_REG_MOTOR_RUN|FPGA_REG_MOTOR_STOP|FPGA_REG_MOTOR_EMERGENCY_BRAKE, FPGA_REG_MOTOR_EMERGENCY_BRAKE);
-
-	//motor->status = _fpga_stepmotor_status(motor);
-	motor->status = STEPPERMOTOR_STOPPED_BY_TOTAL_STEPS;
 }
 
 #if 0
@@ -242,6 +239,7 @@ static int fpga_stepmotor_config(struct steppermotor *motor, const struct steppe
 		speedtable = motor_rc->rampinfo->speeds[index].accel_table;
 
 		rsteps = steps * speedtable->stepping;
+		
 
 		ptr_ramp = (void *)((uint32_t)motor_rc->ram_base + FPGA_RAM_MOTOR_TABLE_RAMP);
 		ptr_count = (void *)((uint32_t)motor_rc->mmio_base + FPGA_REG_MOTOR_ACCEL_STEPS);
@@ -293,7 +291,6 @@ err_handling:
 	return 0;
 }
 
-
 static int fpga_stepmotor_get_running_steps(struct steppermotor *motor)
 {
 	struct fpga_stepmotor_resource *motor_rc;
@@ -313,7 +310,37 @@ static int fpga_stepmotor_get_running_steps(struct steppermotor *motor)
 	return val;
 }
 
+static int fpag_stepmotor_set_running_steps(struct steppermotor *motor, int steps)
+{
+  	struct fpga_stepmotor_resource *motor_rc;
+	void *ptr_count, *ptr_const, *ptr_dec;
+	int cur_steps, dec_steps, rs;
+	
+	if (!motor)
+		return -1;
+	if (!steppermotor_is_running(motor->status))
+		return -1;
 
+	motor_rc = (struct fpga_stepmotor_resource *)motor->resource;
+	
+  	ptr_count = (void *)((uint32_t)motor_rc->mmio_base + FPGA_REG_MOTOR_ACCEL_STEPS);
+	ptr_const = (void *)((uint32_t)ptr_count + sizeof(uint32_t));
+	ptr_dec = (void *)((uint32_t)ptr_const + sizeof(uint32_t));
+	
+	rs = fpga_readl(&dec_steps, (char *)ptr_dec);
+	if (rs)
+		return rs;
+	
+	cur_steps = fpga_stepmotor_get_running_steps(motor);	
+	steps += cur_steps;
+	steps *= motor_rc->stepping;
+	if(steps>dec_steps)
+	{
+	  	steps -= dec_steps;
+		ptr_count = fpga_ram_load_value(ptr_const, steps);
+	}
+	return 0;
+}
 
 static struct steppermotor_ops fpga_stepmotor_ops = {
 	.config = fpga_stepmotor_config,
@@ -322,6 +349,7 @@ static struct steppermotor_ops fpga_stepmotor_ops = {
 	.stop = fpga_stepmotor_stop,
 	.emergencybrake = fpga_stepmotor_emergencybrake,
 	.get_running_steps = fpga_stepmotor_get_running_steps,
+	.set_running_steps = fpag_stepmotor_set_running_steps,
 };
 
 int fpga_stepmotor_install(struct steppermotor *motor)

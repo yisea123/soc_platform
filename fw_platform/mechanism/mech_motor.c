@@ -15,7 +15,7 @@
 static void step_motor_stop(struct motor_data *pmotor_data )
 {
 	steppermotor_stop(pmotor_data->motor_dev.psteppermotor); 
-	//steppermotor_emergencybrake(pmotor_data->motor_info.psteppermotor);
+	//steppermotor_emergencybrake(pmotor_data->motor_dev.psteppermotor);
 }
 //===============================================================
 void stepmotor_err_callback(struct motor_data *pmotor_data, int ret)
@@ -49,8 +49,20 @@ void stepmotor_err_callback(struct motor_data *pmotor_data, int ret)
 
 static void stepmotor_stop_by_sensor(struct photosensor * pphotosensor, sensor_event_t sensor_event, void *pdata)
 {
+  	struct motor_data *pmotor_data = (struct motor_data *)pdata;
+	
 	photosensor_unset_event(pphotosensor, sensor_event);
 	step_motor_stop((struct motor_data *)pdata );
+	pmotor_data->steps_to_stop = 0;
+}
+
+static void stepmotor_continue_by_sensor(struct photosensor * pphotosensor, sensor_event_t sensor_event, void *pdata)
+{
+  	struct motor_data *pmotor_data = (struct motor_data *)pdata;
+	  
+  	photosensor_unset_event(pphotosensor, sensor_event);	
+	steppermotor_set_running_steps(pmotor_data->motor_dev.psteppermotor, pmotor_data->steps_to_stop);
+	pmotor_data->steps_to_stop = 0;
 }
 
 int stepmotor_triger_deal(struct motor_data *pmotor_data, char triger_index, mechanism_uint_motor_data_t *punit_motor_data, mechanism_uint_sensor_data_t *punit_sensor_data)
@@ -65,16 +77,24 @@ int stepmotor_triger_deal(struct motor_data *pmotor_data, char triger_index, mec
 	{
 		if(!motor_trigger_phase->motor_triger_flag.motor_trigger_condition_flag)//MOTOR_TRIGGER_SENSOR_IMEDIAT
 		{
+		  
+		  	sensor_event_t sensor_event;
+			pmotor_data->steps_to_stop = 0;
+			
+			if(motor_trigger_phase->motor_sen_flag == MOTOR_SEN_ARRIVE)
+			  	sensor_event = SENSOR_EV_DETECTED;
+			else if(motor_trigger_phase->motor_sen_flag == MOTOR_SEN_LEAVE)
+			  	sensor_event = SENSOR_EV_UNDETECTED;
+				
 			if(motor_trigger_phase->motor_triger_flag.motor_sensor_stop_flag)
 			{
-				if(motor_trigger_phase->motor_sen_flag == MOTOR_SEN_ARRIVE)
-					//sensor_arrive_set(punit_sensor_data, motor_trigger_phase->sen_mask, step_motor_stop, pmotor_data);
-					//photosensor_set_event(punit_sensor_data->sensor->sen_dev.pphotosensor, SENSOR_EV_DETECTED, stepmotor_stop_by_sensor, pmotor_data);
-					sensor_set_evnet(punit_sensor_data, motor_trigger_phase->sen_mask, SENSOR_EV_DETECTED, stepmotor_stop_by_sensor, pmotor_data);
-				else if(motor_trigger_phase->motor_sen_flag == MOTOR_SEN_LEAVE)
-					//sensor_leave_set(punit_sensor_data, motor_trigger_phase->sen_mask, step_motor_stop, pmotor_data);
-					//photosensor_set_event(punit_sensor_data->sensor->sen_dev.pphotosensor, SENSOR_EV_UNDETECTED, stepmotor_stop_by_sensor, pmotor_data);
-					sensor_set_evnet(punit_sensor_data, motor_trigger_phase->sen_mask, SENSOR_EV_UNDETECTED, stepmotor_stop_by_sensor, pmotor_data);
+				sensor_set_evnet(punit_sensor_data, motor_trigger_phase->sen_mask, sensor_event, stepmotor_stop_by_sensor, pmotor_data);
+			}
+			else
+			{
+			  	if(triger_index==0)
+			  		pmotor_data->steps_to_stop = pmotor_data->pmotor_mov->motor_trigger_phase[(int)triger_index+1].to_trigger_steps;
+			  	sensor_set_evnet(punit_sensor_data, motor_trigger_phase->sen_mask, sensor_event, stepmotor_continue_by_sensor, pmotor_data);
 			}
 		}
 	}
@@ -93,7 +113,7 @@ static int32_t step_motor_start(mechanism_uint_motor_data_t *punit_motor_data, m
 
 	//motor_trigger_phase_t *motor_trigger_phase;
 
-	if ((pmotor_mov->speed_phase_num > STEPSPEED_PHASE_NUM) || (pmotor_mov->trigger_phase_num > STEPSPEED_PHASE_NUM)) {
+	if ((pmotor_mov->speed_phase_num > STEPSPEED_PHASE_NUM) || (pmotor_mov->trigger_phase_num >2)) {
 		return -RESN_MECH_ERR_IVALID_CMD;
 	}
 	

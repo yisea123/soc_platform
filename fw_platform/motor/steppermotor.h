@@ -107,6 +107,8 @@ struct steppermotor_ops {
 	void	(*emergencybrake)(struct steppermotor *motor);
 
 	int	(*get_running_steps)(struct steppermotor *motor);
+        
+	int 	(*set_running_steps)(struct steppermotor *motor, int steps);
 };
 
 
@@ -138,6 +140,6 @@ void steppermotor_lock(struct steppermotor *motor);
 void steppermotor_unlock(struct steppermotor *motor);
 
 int steppermotor_get_running_steps(struct steppermotor *motor);
-
+int steppermotor_set_running_steps(struct steppermotor *motor, int steps);
 
 #endif /* __STEPPERMOTOR_H__ */
