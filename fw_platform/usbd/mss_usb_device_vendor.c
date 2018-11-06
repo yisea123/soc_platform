@@ -493,11 +493,10 @@ static uint8_t usbd_vendor_tx_complete_cb
     }
     if (tx_completed)
     {
-        long high_pri_task_woken;
+        long high_pri_task_woken = pdFALSE;
 
         xSemaphoreGiveFromISR(sem_usb_txdone, &high_pri_task_woken);
-        if (high_pri_task_woken)
-            taskYIELD();
+        portEND_SWITCHING_ISR(high_pri_task_woken);
         usbd_rx_prepare();
     }
     return USB_SUCCESS;
@@ -526,14 +525,13 @@ usbd_vendor_rx_cb
     {
         if (vendor_rx_ep == num)
         {
-            long high_pri_task_woken;
+            long high_pri_task_woken = pdFALSE;
 
             if (rx_count != 0)
             {
                 usbd_receive_data(g_bulk_rx_data, rx_count);
                 xSemaphoreGiveFromISR(sem_usb_rxdata, &high_pri_task_woken);
-                if (high_pri_task_woken)
-                    taskYIELD();
+                portEND_SWITCHING_ISR(high_pri_task_woken);
             }
             if (rx_count == sizeof(g_bulk_rx_data))
                 usbd_rx_prepare();
