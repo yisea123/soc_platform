@@ -74,12 +74,35 @@ int gpiokey_install_devices(void)
 
 int gpiokey_is_active(struct gpiokey *pgpiokey)
 {
-  return ((((struct gpiokey_resource *)pgpiokey->resource)->gpiokey_status == GPIOKEY_ST_ACTIVE)?1:0);
+	struct gpiokey_resource *pgpiokey_rc = (struct gpiokey_resource *)pgpiokey->resource;
+	
+	if(pgpiokey_rc->gpiokey_type<=GPIOKEY_TYPE_IRQ_EDGE_BOTH)
+  		return ((pgpiokey_rc->gpiokey_status == GPIOKEY_ST_ACTIVE)?1:0);
+	else
+	{
+		uint32_t gpio_inputs, val;
+		
+		gpio_inputs = MSS_GPIO_get_inputs();
+		val = ((gpio_inputs & (1 << pgpiokey_rc->gpio)) ? 1 : 0);
+		if((pgpiokey_rc->gpiokey_type==GPIOKEY_TYPE_LEVEL_HIGH) && (val))
+			pgpiokey_rc->gpiokey_status = GPIOKEY_ST_ACTIVE;
+		else if((pgpiokey_rc->gpiokey_type==GPIOKEY_TYPE_LEVEL_LOW) && (!val))
+			pgpiokey_rc->gpiokey_status = GPIOKEY_ST_ACTIVE;
+		else
+			pgpiokey_rc->gpiokey_status = GPIOKEY_ST_NOT_ACTIVE;
+
+		return ((pgpiokey_rc->gpiokey_status == GPIOKEY_ST_ACTIVE)?1:0);
+			
+	}
+		
 }
 
 void gpiokey_status_clear(struct gpiokey *pgpiokey)
 {
-	((struct gpiokey_resource *)pgpiokey->resource)->gpiokey_status=GPIOKEY_ST_NOT_ACTIVE;
+	struct gpiokey_resource *pgpiokey_rc = (struct gpiokey_resource *)pgpiokey->resource;
+
+	if(pgpiokey_rc->gpiokey_type<=GPIOKEY_TYPE_IRQ_EDGE_BOTH)
+		pgpiokey_rc->gpiokey_status=GPIOKEY_ST_NOT_ACTIVE;
 }
 
 int gpiokey_install(struct gpiokey *pgpiokey)
@@ -91,6 +114,8 @@ int gpiokey_install(struct gpiokey *pgpiokey)
 
 	pgpiokey->status_is_active = gpiokey_is_active;
 	pgpiokey->status_clear = gpiokey_status_clear;
+
+	gpiokey_init((struct gpiokey_resource *)pgpiokey->resource);
 
 	return 0;
 }
