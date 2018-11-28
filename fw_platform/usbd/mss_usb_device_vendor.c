@@ -22,9 +22,12 @@
 #include <string.h>
 #include <stdio.h>
 
+#ifndef USB_BAREMETAL
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#endif
+
 #define LOGGING
 #include "debug.h"
 
@@ -141,7 +144,9 @@ volatile int tx_completed, rx_completed;
 
 extern mss_usb_ep_num_t vendor_tx_ep, vendor_rx_ep;
 
+#ifndef USB_BAREMETAL
 extern xSemaphoreHandle sem_usb_rxdata, sem_usb_txdone;
+#endif
 
 mss_usbd_class_cb_t usb_vendor_class_cb = {usbd_vendor_init_cb,
                                            0,
@@ -493,10 +498,12 @@ static uint8_t usbd_vendor_tx_complete_cb
     }
     if (tx_completed)
     {
+#ifndef USB_BAREMETAL
         long high_pri_task_woken = pdFALSE;
 
         xSemaphoreGiveFromISR(sem_usb_txdone, &high_pri_task_woken);
         portEND_SWITCHING_ISR(high_pri_task_woken);
+#endif
         usbd_rx_prepare();
     }
     return USB_SUCCESS;
@@ -520,19 +527,26 @@ usbd_vendor_rx_cb
              RX_EP_DATA_ERROR | RX_EP_PID_ERROR | RX_EP_ISO_INCOMP_ERROR))
     {
         /* Take error mitigation action based on the error indication "status" */
+        rx_completed = 1;
     }
     else
     {
         if (vendor_rx_ep == num)
         {
-            long high_pri_task_woken = pdFALSE;
 
             if (rx_count != 0)
             {
+#ifndef USB_BAREMETAL
+                long high_pri_task_woken = pdFALSE;
+
                 usbd_receive_data(g_bulk_rx_data, rx_count);
                 xSemaphoreGiveFromISR(sem_usb_rxdata, &high_pri_task_woken);
                 portEND_SWITCHING_ISR(high_pri_task_woken);
+#else
+                usbd_receive_data(g_bulk_rx_data, rx_count);
+#endif
             }
+            rx_completed = 1;
             if (rx_count == sizeof(g_bulk_rx_data))
                 usbd_rx_prepare();
         }

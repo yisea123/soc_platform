@@ -1,11 +1,14 @@
 #include <stdio.h>
 
+#ifndef USB_BAREMETAL
 #include "FreeRTOS.h"
 #include "task.h"
 #include "semphr.h"
+#endif
 
 #include "usbdrv.h"
 
+#include "hal.h"
 #include "mss_assert.h"
 #include "mss_usb_device_vendor.h"
 
@@ -19,7 +22,15 @@ extern mss_usbd_user_descr_cb_t vendor_dev_descriptors_cb;
 int usb_online;
 mss_usb_ep_num_t vendor_tx_ep, vendor_rx_ep;
 
+#ifndef USB_BAREMETAL
 xSemaphoreHandle sem_usb_rxdata = NULL, sem_usb_txdone = NULL;
+#define USBD_ENTER_CRITICAL()	taskENTER_CRITICAL()
+#define USBD_EXIT_CRITICAL()	taskEXIT_CRITICAL()
+#else
+psr_t saved_psr;
+#define USBD_ENTER_CRITICAL()	(saved_psr = HAL_disable_interrupts())
+#define USBD_EXIT_CRITICAL()	HAL_restore_interrupts(saved_psr)
+#endif
 
 static uint8_t rxbuffer[2048];
 int rx_put_index, rx_get_index;
@@ -64,8 +75,12 @@ int usbd_write(const uint8_t* buf, uint32_t len)
 	ASSERT(!(((uint32_t)buf) & 0x00000002));
 	tx_completed = 0;
 	MSS_USBD_tx_ep_write(vendor_tx_ep, (uint8_t *)buf, len);
+#ifndef USB_BAREMETAL
 	if (xSemaphoreTake(sem_usb_txdone, USBD_TX_TIMEOUT) == pdFALSE)
 		return -1;	// return -1 when timeout
+#else
+	while (!tx_completed) ;
+#endif
 	return len;
 }
 
@@ -75,18 +90,23 @@ int usbd_read(uint8_t* buf, uint32_t len)
 	uint8_t *src, *dst;
 	uint32_t i, cnt;
 
+	rx_completed = 0;
 	while (rxdata_count == 0)
 	{
-		taskENTER_CRITICAL();
+		USBD_ENTER_CRITICAL();
 		usbd_rx_prepare();
-		taskEXIT_CRITICAL();
+		USBD_EXIT_CRITICAL();
 
+#ifndef USB_BAREMETAL
 		if (xSemaphoreTake(sem_usb_rxdata, USBD_RX_TIMEOUT) == pdFALSE && rxdata_count == 0)
 			return -1;	// return -1 when timeout
+#else
+		while (!rx_completed) ;
+#endif
 	}
 	dst = buf;
 	src = &rxbuffer[rx_get_index];
-	taskENTER_CRITICAL();
+	USBD_ENTER_CRITICAL();
 	cnt = (rxdata_count < len) ? rxdata_count : len;
 	for (i = 0; i < cnt; i++)
 	{
@@ -97,7 +117,7 @@ int usbd_read(uint8_t* buf, uint32_t len)
 		}
 	}
 	rxdata_count -= cnt;
-	taskEXIT_CRITICAL();
+	USBD_EXIT_CRITICAL();
 
 	return cnt;
 }
@@ -114,10 +134,12 @@ int usbd_install(const struct usbd_config *config)
 
 	usbd_rxdata_reset();
 
+#ifndef USB_BAREMETAL
 	vSemaphoreCreateBinary(sem_usb_rxdata);
 	vSemaphoreCreateBinary(sem_usb_txdone);
 	if (sem_usb_rxdata == NULL || sem_usb_txdone == NULL)
 		return -1;
+#endif
 
 	/* Initialize USB driver. */
 	MSS_USBD_init(MSS_USB_DEVICE_HS);
