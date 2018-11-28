@@ -34,7 +34,11 @@ void gpiokey_init(struct gpiokey_resource *pgpiokey_rc)
 			break;
 		case GPIOKEY_TYPE_IRQ_EDGE_BOTH:
 		  	MSS_GPIO_config((mss_gpio_id_t)pgpiokey_rc->gpio, MSS_GPIO_INPUT_MODE|MSS_GPIO_IRQ_EDGE_BOTH);
-		  	break;
+            break;
+        case GPIOKEY_TYPE_LEVEL_LOW:
+        case GPIOKEY_TYPE_LEVEL_HIGH:
+		  	MSS_GPIO_config((mss_gpio_id_t)pgpiokey_rc->gpio, MSS_GPIO_INPUT_MODE);
+		  	return;
 		default:
 		  	return;
 		}
