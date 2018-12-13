@@ -32,8 +32,10 @@ psr_t saved_psr;
 #define USBD_EXIT_CRITICAL()	HAL_restore_interrupts(saved_psr)
 #endif
 
-static uint8_t rxbuffer[2048];
-int rx_put_index, rx_get_index;
+static uint8_t rxbuffer[2560];
+static uint32_t rxbuffer_len = sizeof(rxbuffer);
+
+volatile int rx_put_index, rx_get_index;
 
 volatile uint32_t rxdata_count;
 
@@ -46,28 +48,57 @@ void usbd_rxdata_reset()
 	rx_get_index = rx_put_index = 0;
 }
 
+	
+
+uint32_t usbd_get_buffer_data_count(void)
+{
+	uint32_t get_tmp, put_tmp;
+
+	get_tmp = rx_get_index;
+	put_tmp = rx_put_index;
+	return ((put_tmp >= get_tmp)?(put_tmp - get_tmp):(rxbuffer_len - get_tmp + put_tmp));
+}
+
+uint32_t usbd_buffer_is_full(void)
+{
+	uint32_t get_tmp, put_tmp;
+
+	get_tmp = rx_get_index;
+	put_tmp = rx_put_index+1;
+
+	if(put_tmp==rxbuffer_len)
+		put_tmp = 0;
+	if(put_tmp==get_tmp)
+		return 1;
+	return 0;
+}
+#define usbd_buffer_is_empty()		(rx_put_index==rx_get_index)
 
 uint32_t usbd_receive_data(uint8_t *buffer, uint32_t len)
 {
 	uint8_t *src, *dst;
 	uint32_t i, cnt;
 
+	if(usbd_buffer_is_full())
+		return 0;
+	
 	src = buffer;
 	dst = &rxbuffer[rx_put_index];
-	cnt = rxdata_count;
+	cnt = rxbuffer_len - usbd_get_buffer_data_count()-1;
+	len = (cnt>len)?len:cnt;
+
 	for (i = 0; i < len; i++)
 	{
 		*dst++ = *src++;
-		if (++rx_put_index == sizeof(rxbuffer)) {
+		if (++rx_put_index == rxbuffer_len) {
 			rx_put_index = 0;
 			dst = rxbuffer;
 		}
-		if (++rxdata_count == sizeof(rxbuffer))
-			break;
 	}
-	return rxdata_count - cnt;
+	
+	//printf("\n\rusb receive: put=%d, get=%d\n\r", rx_put_index,  rx_get_index);
+	return len;
 }
-
 
 int usbd_write(const uint8_t* buf, uint32_t len)
 {
@@ -84,44 +115,35 @@ int usbd_write(const uint8_t* buf, uint32_t len)
 	return len;
 }
 
-
 int usbd_read(uint8_t* buf, uint32_t len)
 {
 	uint8_t *src, *dst;
-	uint32_t i, cnt;
+	uint32_t i, cnt, datalen;
 
-	rx_completed = 0;
-	while (rxdata_count == 0)
+	while (usbd_buffer_is_empty())
 	{
-		USBD_ENTER_CRITICAL();
-		usbd_rx_prepare();
-		USBD_EXIT_CRITICAL();
-
 #ifndef USB_BAREMETAL
-		if (xSemaphoreTake(sem_usb_rxdata, USBD_RX_TIMEOUT) == pdFALSE && rxdata_count == 0)
+		if (xSemaphoreTake(sem_usb_rxdata, USBD_RX_TIMEOUT) == pdFALSE)
 			return -1;	// return -1 when timeout
-#else
-		while (!rx_completed) ;
 #endif
 	}
 	dst = buf;
 	src = &rxbuffer[rx_get_index];
-	USBD_ENTER_CRITICAL();
-	cnt = (rxdata_count < len) ? rxdata_count : len;
+	datalen = usbd_get_buffer_data_count();
+	
+	cnt = (datalen < len) ? datalen : len;
 	for (i = 0; i < cnt; i++)
 	{
 		*dst++ = *src++;
-		if (++rx_get_index == sizeof(rxbuffer)) {
+		if (++rx_get_index == rxbuffer_len) {
 			rx_get_index = 0;
 			src = rxbuffer;
 		}
 	}
-	rxdata_count -= cnt;
-	USBD_EXIT_CRITICAL();
 
+	//printf("\n\rusbd_read: put=%d, get=%d\n\r",rx_put_index, rx_get_index);
 	return cnt;
 }
-
 
 int usbd_install(const struct usbd_config *config)
 {
