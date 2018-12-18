@@ -55,9 +55,19 @@ int nvram_read(struct nvram *nvm, void *buffer, int offset, int count)
 
 int nvram_write(struct nvram *nvm, const void *buffer, int offset, int count)
 {
-	if (nvm && buffer && count > 0 && offset < nvm->feature.size)
-		return nvm->write(nvm, buffer, offset, count);
-
+	int ret;
+	struct nvram *pnvm =  nvm;
+	
+	if (pnvm && buffer && (count > 0) && (offset < pnvm->feature.size))
+	{
+		if(pnvm->erase_block)
+		{
+			ret = pnvm->erase_block(pnvm, offset, count);
+			if(ret)
+				return -1;
+		}
+		return pnvm->write(pnvm, buffer, offset, count);
+	}
 	return -1;
 }
 

@@ -4,10 +4,15 @@
 #include <stdint.h>
 #include <stddef.h>
 
+typedef enum{
+	NVRAM_TYPE_ENVM,
+	NVRAM_TYPE_EEPROM,
+	NVRAM_TYPE_SPIFLASH,
+}nvram_type_t;
 
 /* nvram feature information block */
 struct nvram_feature {
-	int type;			// nvram type
+	nvram_type_t type;		// nvram type
 	int size;			// size of nvram device (in Bytes)
 	int pagesize;			// size of a nvram device page (in Bytes)
 };
@@ -23,7 +28,9 @@ struct nvram {
 	int (*const install)(struct nvram *nvm);	// pointer to the device installation function 
 	struct nvram_feature feature;
 	/* nvram operation functions: */
+	int (* global_unprotect)( struct nvram *nvm );
 	int (* erase)(struct nvram *nvm);
+	int (* erase_block)(struct nvram *nvm, uint32_t address, uint32_t block_size);
 	int (* read)(struct nvram *nvm, void *buffer, int offset, int count);
 	int (* write)(struct nvram *nvm, const void *buffer, int offset, int count);
 };

@@ -1139,6 +1139,7 @@
         <option>
           <name>CCDefines</name>
           <state>NDEBUG</state>
+          <state>USB_BAREMETAL</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -2030,6 +2031,9 @@
       <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\at24cxx.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\mt5ql128aba.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\nvmapi.c</name>
     </file>
     <file>
@@ -2039,10 +2043,25 @@
       <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\nvram.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\s25fl128p.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\socnvm.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\socnvm.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\spiflash.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\spiflash.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\w25q16jv.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\w25q32jv.c</name>
     </file>
   </group>
   <group>
