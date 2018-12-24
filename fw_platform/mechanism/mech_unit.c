@@ -506,7 +506,6 @@ int32_t 	mechunit_init(struct mechanism_dev_t * mech_dev, mech_control_t *mech_c
 	return ret;
 }
 
-
 int32_t	mechunit_motor_move(struct mechanism_dev_t * mech_dev, mech_control_t *mech_control)
 {
 	int32_t ret;
@@ -529,7 +528,8 @@ int32_t	mechunit_motor_move(struct mechanism_dev_t * mech_dev, mech_control_t *m
 	ret = motor_wait_stop(&mech_dev->mech_unit_data.unit_motor_data, 
 		&mech_dev->mech_unit_data.unit_sensor_data,
 		pmech_motor_move->motor_mask); 
-
+	
+	motor_end(&mech_dev->mech_unit_data.unit_motor_data, &mech_dev->mech_unit_data.unit_sensor_data,pmech_motor_move->motor_mask);
 end_mech_motor_move:
 	return ret;
 }

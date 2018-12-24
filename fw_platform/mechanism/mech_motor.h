@@ -119,6 +119,9 @@ typedef struct {
 extern int32_t motor_move_init(mechanism_uint_motor_data_t *punit_motor_data, unsigned short motor_mask);
 extern int32_t motor_start(mechanism_uint_motor_data_t *punit_motor_data, mechanism_uint_sensor_data_t *punit_sensor_data, 
 	unsigned short motor_mask, unsigned char dir, motor_mov_t  *pmotor_mov);
+extern uint32_t motor_end(mechanism_uint_motor_data_t *punit_motor_data, mechanism_uint_sensor_data_t *punit_sensor_data,
+	unsigned short motor_mask);
+
 extern int32_t motor_stop(mechanism_uint_motor_data_t *punit_motor_data, unsigned short motor_mask);
 extern int32_t bmotor_stoped(mechanism_uint_motor_data_t *punit_motor_data, unsigned short motor_mask);
 extern int32_t motor_wait_stop(mechanism_uint_motor_data_t *punit_motor_data, mechanism_uint_sensor_data_t *punit_sensor_data, unsigned short motor_mask);

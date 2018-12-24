@@ -102,6 +102,40 @@ int stepmotor_triger_deal(struct motor_data *pmotor_data, char triger_index, mec
 	return ret;
 }
 
+int stepmotor_triger_end(struct motor_data *pmotor_data, char triger_index, mechanism_uint_motor_data_t *punit_motor_data, mechanism_uint_sensor_data_t *punit_sensor_data)
+{
+	int32_t ret = 0;
+	motor_trigger_phase_t *motor_trigger_phase;
+	
+	motor_trigger_phase = &(pmotor_data->pmotor_mov->motor_trigger_phase[(int)triger_index]);
+	
+	if(!motor_trigger_phase->motor_triger_flag.motor_trigger_stop_flag)
+	{
+		if(!motor_trigger_phase->motor_triger_flag.motor_trigger_condition_flag)//MOTOR_TRIGGER_SENSOR_IMEDIAT
+		{
+		  
+		  	sensor_event_t sensor_event;
+					
+			if(motor_trigger_phase->motor_sen_flag == MOTOR_SEN_ARRIVE)
+			  	sensor_event = SENSOR_EV_DETECTED;
+			else if(motor_trigger_phase->motor_sen_flag == MOTOR_SEN_LEAVE)
+			  	sensor_event = SENSOR_EV_UNDETECTED;
+				
+			if(motor_trigger_phase->motor_triger_flag.motor_sensor_stop_flag)
+			{
+				sensor_unset_evnet(punit_sensor_data, motor_trigger_phase->sen_mask, sensor_event);
+			}
+			else
+			{
+			  	sensor_unset_evnet(punit_sensor_data, motor_trigger_phase->sen_mask, sensor_event);
+			}
+		}
+	}
+
+	return ret;
+}
+
+
 static int32_t step_motor_start(mechanism_uint_motor_data_t *punit_motor_data, mechanism_uint_sensor_data_t *punit_sensor_data,
 	struct motor_data *pmotor_data,unsigned char dir,  motor_mov_t  * pmotor_mov)		
 {
@@ -262,6 +296,23 @@ static int32_t step_motor_start(mechanism_uint_motor_data_t *punit_motor_data, m
 	}
 	
 	//printk(KERN_DEBUG "step_motor_start.................over!\n");
+	return ret;
+}
+
+static int32_t step_motor_end(mechanism_uint_motor_data_t *punit_motor_data, mechanism_uint_sensor_data_t *punit_sensor_data,
+	struct motor_data *pmotor_data)		
+{
+	int32_t ret=0;
+	
+	if (pmotor_data->pmotor_mov->trigger_phase_num)
+	{
+		ret = stepmotor_triger_end(pmotor_data, 0, punit_motor_data, punit_sensor_data);
+
+		if (ret) {
+			return ret;
+		}		
+	}
+	
 	return ret;
 }
 
@@ -534,6 +585,21 @@ int32_t motor_start(mechanism_uint_motor_data_t *punit_motor_data, mechanism_uin
 	return 0;
 }
 
+uint32_t motor_end(mechanism_uint_motor_data_t *punit_motor_data, mechanism_uint_sensor_data_t *punit_sensor_data,
+	unsigned short motor_mask)
+{
+	struct motor_data *pmotor_data;
+	unsigned char i;
+
+	//printk(KERN_DEBUG "motor_start.................\n");
+    
+	motor_get_data(punit_motor_data, motor_mask, pmotor_data, i);
+	if (i==punit_motor_data->motor_num) {
+		return -RESN_MECH_ERR_MOTOR_GETDATA;
+	}
+
+	return step_motor_end(punit_motor_data, punit_sensor_data, pmotor_data);
+}
 //----------------------stop motor moving and wait until stopped----------------------
 int32_t motor_stop(mechanism_uint_motor_data_t *punit_motor_data, unsigned short motor_mask)
 {

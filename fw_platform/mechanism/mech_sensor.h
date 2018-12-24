@@ -62,6 +62,7 @@ extern int sensor_set_config(mechanism_uint_sensor_data_t *punit_sensor_data, me
 //extern int sensor_get_feature(mechanism_uint_sensor_data_t *punit_sensor_data, sen_feature_t *p_ppsfeature);
 
 extern int32_t sensor_set_evnet(mechanism_uint_sensor_data_t *punit_sensor_data, uint32_t sen_mask, sensor_event_t event, void (*eventhandle)(struct photosensor *, sensor_event_t, void *), void *data);
+extern int32_t sensor_unset_evnet(mechanism_uint_sensor_data_t *punit_sensor_data, uint32_t sen_mask, sensor_event_t event);
 //===================================================
 #if 0
 // 启动到达传感器检测

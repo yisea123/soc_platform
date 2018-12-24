@@ -95,6 +95,18 @@ int32_t sensor_set_evnet(mechanism_uint_sensor_data_t *punit_sensor_data, uint32
 	return photosensor_set_event(psen_data->sen_dev.pphotosensor, event, eventhandle, data);
 }
 
+int32_t sensor_unset_evnet(mechanism_uint_sensor_data_t *punit_sensor_data, uint32_t sen_mask, sensor_event_t event)
+{
+	struct sensor_data *psen_data;
+	unsigned int j;
+
+	sensor_get_data(punit_sensor_data, sen_mask, psen_data, j);
+        if (j==punit_sensor_data->sensor_num) {
+            return -RESN_MECH_ERR_SENSOR_GETDATA;
+        }
+	return photosensor_unset_event(psen_data->sen_dev.pphotosensor, event);
+}
+
 #if 0
 //----------------------get the status of sensor(detected or undetected)----------------------
 int32_t sensor_get_appval(mechanism_uint_sensor_data_t *punit_sensor_data, uint32_t sen_mask, uint32_t *appval)
