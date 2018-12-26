@@ -33,5 +33,5 @@ extern int scanunit_get_sensor_config(int device, struct scanunit_config *config
 extern int scanunit_set_sensor_config(int device, const struct scanunit_config *config);
 extern int scanunit_get_sensor_common_config(struct scan_reg_config *regconfig);
 extern int scanunit_set_sensor_common_config(const struct scan_reg_config *regconfig);
-
+extern int scanunit_get_wr_addr(void);
 #endif /* __SCANDRV_H__ */

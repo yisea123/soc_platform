@@ -85,6 +85,14 @@ int scanunit_get_scanlines(void)
 	return (int)val;
 }
 
+int scanunit_get_wr_addr(void)
+{
+	uint32_t val=0, tmp1=0, tmp2=0;
+	fpga_readl(&tmp1, (char *)scanctrl_reg_base + FPGA_REG_CIS_DDR_PRESENT_WR_ADDR_L);
+	fpga_readl(&tmp2, (char *)scanctrl_reg_base + FPGA_REG_CIS_DDR_PRESENT_WR_ADDR_H);
+	val = (tmp2<<16) + tmp1;
+	return (int)val;
+}
 
 int scanunit_get_hwinfo(const struct scanunit_hwinfo *hwinfo)
 {
