@@ -18,4 +18,5 @@ extern void fpga_enable_interrupt(uint32_t);
 extern void fpga_disable_interrupt(uint32_t);
 extern void fpga_clear_interrupt(uint32_t);
 extern void fpga_enable(uint32_t on_off);
+extern uint32_t fpga_get_product_type(void);
 #endif

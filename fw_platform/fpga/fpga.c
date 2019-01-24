@@ -21,6 +21,13 @@ uint32_t fpga_get_version(void)
 	return version;
 }
 
+uint32_t fpga_get_product_type(void)
+{
+	uint32_t type;
+	fpga_readl(&type, (char *)ctrl_reg_base + FPGA_REG_PRODUCT_TYPE);
+	return type;
+}
+
 void fpga_enable(uint32_t on_off)
 {
 	fpga_update_lbits((char *)ctrl_reg_base + FPGA_REG_ENABLE, 1, on_off);

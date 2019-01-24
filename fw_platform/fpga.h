@@ -10,6 +10,7 @@
 #define FPGA_REG_STATUS				0x0000
 #define FPGA_REG_VERSION			0x0004
 #define FPGA_REG_ENABLE 			0x0008
+#define FPGA_REG_PRODUCT_TYPE 			0x000c
 
 /* Section 2: FPGA interrupt registers */
 /* memory map (offset to base address): */

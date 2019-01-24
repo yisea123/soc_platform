@@ -38,5 +38,5 @@ struct gpiokey {
 
 extern int gpiokey_install_devices(void);
 extern int gpiokey_install(struct gpiokey *pgpiokey);
-
+extern int gpiokey_is_active(struct gpiokey *pgpiokey);
 #endif
