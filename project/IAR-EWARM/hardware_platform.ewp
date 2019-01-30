@@ -1974,6 +1974,9 @@
       <name>$PROJ_DIR$\..\..\hw_platform\drivers\CoreSPI\core_spi.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\..\..\..\platform\hw_platform\drivers\mss_sys_services\mss_comblk.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\hw_platform\drivers\mss_gpio\mss_gpio.c</name>
     </file>
     <file>
