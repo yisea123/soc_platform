@@ -332,11 +332,11 @@ static int fpag_stepmotor_set_running_steps(struct steppermotor *motor, int step
 		return rs;
 	
 	cur_steps = fpga_stepmotor_get_running_steps(motor);	
-	steps += cur_steps;
 	steps *= motor_rc->stepping;
 	if(steps>dec_steps)
 	{
 	  	steps -= dec_steps;
+		steps += (cur_steps*motor_rc->stepping);
 		ptr_count = fpga_ram_load_value(ptr_const, steps);
 	}
 	return 0;
