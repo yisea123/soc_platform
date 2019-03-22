@@ -77,8 +77,22 @@ static void fpga_stepmotor_emergencybrake(struct steppermotor *motor)
 		return;
 
 	motor_rc = (struct fpga_stepmotor_resource *)motor->resource;
-	fpga_update_lbits((char *)motor_rc->mmio_base + FPGA_REG_MOTOR_CONTROL, FPGA_REG_MOTOR_RUN|FPGA_REG_MOTOR_STOP|FPGA_REG_MOTOR_EMERGENCY_BRAKE, FPGA_REG_MOTOR_EMERGENCY_BRAKE);
+	fpga_update_lbits((char *)motor_rc->mmio_base + FPGA_REG_MOTOR_CONTROL, FPGA_REG_MOTOR_STOP|FPGA_REG_MOTOR_EMERGENCY_BRAKE, FPGA_REG_MOTOR_EMERGENCY_BRAKE);
 }
+
+static void fpga_stepmotor_stopbysoft(struct steppermotor *motor)
+{
+	struct fpga_stepmotor_resource *motor_rc;
+
+	if (!motor)
+		return;
+
+	motor_rc = (struct fpga_stepmotor_resource *)motor->resource;
+	//触发式控制，进入减速停止状态
+	fpga_update_lbits((char *)motor_rc->mmio_base + FPGA_REG_MOTOR_CONTROL, FPGA_REG_MOTOR_STOP|FPGA_REG_MOTOR_EMERGENCY_BRAKE, FPGA_REG_MOTOR_STOP);
+	fpga_update_lbits((char *)motor_rc->mmio_base + FPGA_REG_MOTOR_CONTROL, FPGA_REG_MOTOR_STOP|FPGA_REG_MOTOR_EMERGENCY_BRAKE, 0);
+}
+
 
 #if 0
 static inline int _fpga_stepmotor_status(struct steppermotor *motor)
@@ -140,7 +154,7 @@ static int fpga_stepmotor_hw_init(struct steppermotor *motor)
 static inline void  * fpga_ram_load_ramptable(void *addr, void *limit, uint32_t flag, struct motor_speedtable *speedtable)
 {
 	void  *ptr = addr;
-	int32_t i;
+	int32_t i, j;
 	uint32_t val, val1;
 	dec_ramp_attr_t dec_ramp_attr = speedtable->dec_ramp_attr;
 
@@ -154,9 +168,13 @@ static inline void  * fpga_ram_load_ramptable(void *addr, void *limit, uint32_t 
 				return (void  *)(-1);	// exceed table limit, return error
 			}
 			val = speedtable->ramp_table[speedtable->ramp_size-i-1] | flag;
-			fpga_writel(val, ptr);
-			fpga_readl(&val1, ptr);//test
-
+			for(j=0; j<5; j++)
+			{
+				fpga_writel(val, ptr);			
+				fpga_readl(&val1, ptr);
+				if(val1==val)
+					break;
+			}
 			ptr = (void *)((uint32_t)ptr+sizeof(uint32_t));
 		}
 	}
@@ -168,8 +186,13 @@ static inline void  * fpga_ram_load_ramptable(void *addr, void *limit, uint32_t 
 				return (void  *)(-1);	// exceed table limit, return error
 			}
 			val = speedtable->ramp_table[i] | flag;
-			fpga_writel(val, ptr);
-			fpga_readl(&val1, ptr);//test
+			for(j=0; j<5; j++)
+			{
+				fpga_writel(val, ptr);
+				fpga_readl(&val1, ptr);
+				if(val1==val)
+					break;
+			}
 			ptr = (void *)((uint32_t)ptr+sizeof(uint32_t));
 		}
 	}
@@ -179,7 +202,16 @@ static inline void  * fpga_ram_load_ramptable(void *addr, void *limit, uint32_t 
 
 static inline void * fpga_ram_load_value(void *addr, uint32_t value)
 {
-	fpga_writel(value, addr);
+	uint32_t val;
+	int32_t i;
+
+	for(i=0; i<5; i++)
+	{
+		fpga_writel(value, addr);
+		fpga_readl(&val, addr);
+		if(val == value)
+			break;
+	}
 	addr = (void *)((uint32_t)addr + sizeof(uint32_t));
 	return addr;		// return next loading address
 }
@@ -198,7 +230,7 @@ static int fpga_stepmotor_config(struct steppermotor *motor, const struct steppe
 	ret = steppermotor_check_config(motor, config);
 	if (ret < 0)
 	{
-//		dev_err(motor->dev, "error in configuration of steppermotor");
+		printf("error in configuration of steppermotor");
 		return -ret;
 	}
 
@@ -348,6 +380,7 @@ static struct steppermotor_ops fpga_stepmotor_ops = {
 	.start = fpga_stepmotor_start,
 	.stop = fpga_stepmotor_stop,
 	.emergencybrake = fpga_stepmotor_emergencybrake,
+	.stopbysoft = fpga_stepmotor_stopbysoft,
 	.get_running_steps = fpga_stepmotor_get_running_steps,
 	.set_running_steps = fpag_stepmotor_set_running_steps,
 };

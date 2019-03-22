@@ -165,6 +165,11 @@ void steppermotor_stop(struct steppermotor *motor)
 		motor->ops->stop(motor);
 }
 
+void steppermotor_stopbysoft(struct steppermotor *motor)
+{
+	if (motor)
+		motor->ops->stopbysoft(motor);
+}
 
 void steppermotor_emergencybrake(struct steppermotor *motor)
 {
