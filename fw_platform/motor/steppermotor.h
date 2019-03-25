@@ -105,7 +105,7 @@ struct steppermotor_ops {
 	int	(*lock)(struct steppermotor *motor);
 	int	(*unlock)(struct steppermotor *motor);
 	void	(*emergencybrake)(struct steppermotor *motor);
-
+	void	(*stopbysoft)(struct steppermotor *motor);
 	int	(*get_running_steps)(struct steppermotor *motor);
         
 	int 	(*set_running_steps)(struct steppermotor *motor, int steps);
@@ -135,6 +135,7 @@ extern int steppermotor_status(struct steppermotor *motor);
 
 extern int steppermotor_start(struct steppermotor *motor);
 extern void steppermotor_stop(struct steppermotor *motor);
+extern void steppermotor_stopbysoft(struct steppermotor *motor);
 extern void steppermotor_emergencybrake(struct steppermotor *motor);
 void steppermotor_lock(struct steppermotor *motor);
 void steppermotor_unlock(struct steppermotor *motor);
