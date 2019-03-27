@@ -31,6 +31,14 @@
 #define STOP_TABLE_DEEP		(256)
 #define MOTO_RUN_STEP_MASK	0xffff
 
+typedef enum{
+	STEP_MODE_FULL=1,
+	STEP_MODE_HALF=2,
+	STEP_MODE_QUARTER=4,
+	STEP_MODE_8MICRO=8,
+	STEP_MODE_16MICRO=16
+} step_mode_t;
+
 
 /* detailed information of a speed */
 struct speed_detail {
@@ -101,11 +109,11 @@ struct steppermotor_ops {
 	int	(*status)(struct steppermotor *motor);
 
 	int	(*start)(struct steppermotor *motor);
-	void	(*stop)(struct steppermotor *motor);
+	void	(*reset)(struct steppermotor *motor);
 	int	(*lock)(struct steppermotor *motor);
 	int	(*unlock)(struct steppermotor *motor);
 	void	(*emergencybrake)(struct steppermotor *motor);
-	void	(*stopbysoft)(struct steppermotor *motor);
+	void	(*stop)(struct steppermotor *motor);
 	int	(*get_running_steps)(struct steppermotor *motor);
         
 	int 	(*set_running_steps)(struct steppermotor *motor, int steps);
@@ -134,8 +142,8 @@ extern int steppermotor_set_callback(struct steppermotor *motor, void (*callback
 extern int steppermotor_status(struct steppermotor *motor);
 
 extern int steppermotor_start(struct steppermotor *motor);
+extern void steppermotor_reset(struct steppermotor *motor);
 extern void steppermotor_stop(struct steppermotor *motor);
-extern void steppermotor_stopbysoft(struct steppermotor *motor);
 extern void steppermotor_emergencybrake(struct steppermotor *motor);
 void steppermotor_lock(struct steppermotor *motor);
 void steppermotor_unlock(struct steppermotor *motor);

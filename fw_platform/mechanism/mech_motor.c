@@ -12,9 +12,9 @@
 //#define	PHASE_COMPLETION_TIMEOUT(phase_steps)	(phase_steps/2)
 #define	PHASE_COMPLETION_TIMEOUT(phase_steps)	(phase_steps*3)//(0x3ff)
 
-static void step_motor_stop(struct motor_data *pmotor_data )
+static void step_motor_reset(struct motor_data *pmotor_data )
 {
-	steppermotor_stop(pmotor_data->motor_dev.psteppermotor); 
+	steppermotor_reset(pmotor_data->motor_dev.psteppermotor); 
 	//steppermotor_emergencybrake(pmotor_data->motor_dev.psteppermotor);
 }
 //===============================================================
@@ -52,7 +52,7 @@ static void stepmotor_stop_by_sensor(struct photosensor * pphotosensor, sensor_e
   	struct motor_data *pmotor_data = (struct motor_data *)pdata;
 	
 	photosensor_unset_event(pphotosensor, sensor_event);
-	steppermotor_stopbysoft(pmotor_data->motor_dev.psteppermotor);
+	steppermotor_stop(pmotor_data->motor_dev.psteppermotor);
 	pmotor_data->steps_to_stop = 0;
 }
 
@@ -263,7 +263,7 @@ static int32_t step_motor_start(mechanism_uint_motor_data_t *punit_motor_data, m
 				#else
 				//mechctrl_clear_trigger_next(&pmotor_data->motor_dev.psteppermotor->pmotordev->mechctrl_source);
 				#endif
-				step_motor_stop(pmotor_data);
+				step_motor_reset(pmotor_data);
 				return ret;
 			}
 			else{
@@ -348,7 +348,7 @@ static int32_t step_motor_wait_stop(struct motor_data *pmotor_data)
 			
 			ret = -RESN_MECH_ERR_MOTOR_WAIT_STOP_TIMEOUT;
 			stepmotor_err_callback(pmotor_data, ret);
-			step_motor_stop(pmotor_data);
+			step_motor_reset(pmotor_data);
 			
 		}
 		pmotor_data->motor_comp_accout--;
@@ -621,8 +621,7 @@ int32_t motor_stop(mechanism_uint_motor_data_t *punit_motor_data, unsigned short
 			break;
 		pmotor_data->moving_status |= MOTOR_STOP_BY_SOFT_START; 
 		//printk(KERN_DEBUG "motor_stop pmotor_data=%x moving_status=%x\n", (unsigned int)pmotor_data, pmotor_data->moving_status);
-		//step_motor_stop(pmotor_data);
-		steppermotor_stopbysoft(pmotor_data->motor_dev.psteppermotor);
+		steppermotor_stop(pmotor_data->motor_dev.psteppermotor);
 		//step_motor_wait_stop(pmotor_data);
 		break;
 		#if 0	

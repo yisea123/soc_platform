@@ -57,7 +57,7 @@ static int fpga_stepmotor_start(struct steppermotor *motor)
 }
 
 
-static void fpga_stepmotor_stop(struct steppermotor *motor)
+static void fpga_stepmotor_reset(struct steppermotor *motor)
 {
 	struct fpga_stepmotor_resource *motor_rc;
 
@@ -80,7 +80,7 @@ static void fpga_stepmotor_emergencybrake(struct steppermotor *motor)
 	fpga_update_lbits((char *)motor_rc->mmio_base + FPGA_REG_MOTOR_CONTROL, FPGA_REG_MOTOR_STOP|FPGA_REG_MOTOR_EMERGENCY_BRAKE, FPGA_REG_MOTOR_EMERGENCY_BRAKE);
 }
 
-static void fpga_stepmotor_stopbysoft(struct steppermotor *motor)
+static void fpga_stepmotor_stop(struct steppermotor *motor)
 {
 	struct fpga_stepmotor_resource *motor_rc;
 
@@ -378,9 +378,9 @@ static struct steppermotor_ops fpga_stepmotor_ops = {
 	.config = fpga_stepmotor_config,
 	.status = fpga_stepmotor_status,
 	.start = fpga_stepmotor_start,
-	.stop = fpga_stepmotor_stop,
+	.reset = fpga_stepmotor_reset,
 	.emergencybrake = fpga_stepmotor_emergencybrake,
-	.stopbysoft = fpga_stepmotor_stopbysoft,
+	.stop = fpga_stepmotor_stop,
 	.get_running_steps = fpga_stepmotor_get_running_steps,
 	.set_running_steps = fpag_stepmotor_set_running_steps,
 };

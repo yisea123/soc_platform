@@ -5,11 +5,6 @@
 
 #define MAXIMUM_STEPS		0xffffffff
 
-typedef enum{
-	STEP_MODE_FULL=1,
-	STEP_MODE_HALF=2,
-	STEP_MODE_16MICRO=16
-} step_mode_t;
 
 
 struct fpga_stepmotor_resource {

@@ -159,16 +159,16 @@ int steppermotor_start(struct steppermotor *motor)
 }
 
 
+void steppermotor_reset(struct steppermotor *motor)
+{
+	if (motor)
+		motor->ops->reset(motor);
+}
+
 void steppermotor_stop(struct steppermotor *motor)
 {
 	if (motor)
 		motor->ops->stop(motor);
-}
-
-void steppermotor_stopbysoft(struct steppermotor *motor)
-{
-	if (motor)
-		motor->ops->stopbysoft(motor);
 }
 
 void steppermotor_emergencybrake(struct steppermotor *motor)
