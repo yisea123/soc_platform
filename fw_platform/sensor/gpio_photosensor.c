@@ -51,6 +51,7 @@ static int gpio_photosensor_status(struct photosensor *sensor, int *status)
 {
 	struct gpio_photosensor_resource *sensor_rc;
 	uint32_t gpio_inputs;
+	int st;
 
 	if (!sensor || !status)
 		return -1;
@@ -60,7 +61,9 @@ static int gpio_photosensor_status(struct photosensor *sensor, int *status)
 		gpio_inputs = MSS_GPIO_get_inputs();
 	else				//  CoreGPIO instance
 		gpio_inputs = GPIO_get_inputs(sensor_rc->gpiochip);
-	*status = (gpio_inputs & (1 << sensor_rc->gpio)) ? 1 : 0;
+	st = (gpio_inputs & (1 << sensor_rc->gpio)) ? 1 : 0;
+	*status = (sensor->status_mapping == SENSOR_ST_DETETED_IS_HIGHLEVEL) ? st : !st;
+
 	return 0;
 }
 
