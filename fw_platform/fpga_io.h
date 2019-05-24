@@ -4,8 +4,10 @@
 #include <hw_reg_io.h>
 #include <string.h>
 
+#define readb(addr)			(*((volatile uint8_t* )(addr)))
 #define readw(addr)			(*((volatile uint16_t* )(addr)))
 #define readl(addr)			(*((volatile uint32_t* )(addr)))
+#define writeb(value, addr)	(*((volatile uint8_t* )(addr))=(uint8_t )(value))
 #define writew(value, addr)	(*((volatile uint16_t* )(addr))=(uint16_t )(value))
 #define writel(value, addr)	(*((volatile uint32_t* )(addr))=(uint32_t )(value))
 
@@ -73,7 +75,7 @@ static __INLINE int32_t fpga_writenw(volatile void *addr, const void *buffer, in
 	return 0;
 }
 
-static __INLINE int32_t fpga_update_lbits(volatile void *addr, uint16_t mask, uint16_t value)
+static __INLINE int32_t fpga_update_lbits(volatile void *addr, uint32_t mask, uint32_t value)
 {
 	uint32_t val = readl(addr);
 	val = (val & ~mask) | (value & mask);

@@ -24,7 +24,18 @@
 #define FPGA_REG_INT_SEL_TYPE3			BIT(2)
 #define FPGA_REG_INT_SEL_TYPE4			BIT(3)
 #define FPGA_REG_INT_SEL_TYPE5			BIT(4)
+#define FPGA_REG_INT_SEL_TYPE6			BIT(5)
+#define FPGA_REG_INT_SEL_TYPE7			BIT(6)
+#define FPGA_REG_INT_SEL_TYPE8			BIT(7)
 #define FPGA_REG_INT_SEL_ALL			BIT(15)
+
+/* definition FPGA interrupt configurations. */
+#define FPGA_IRQ_MODE_NONE			0
+#define FPGA_IRQ_MODE_RISING_EDGE		1
+#define FPGA_IRQ_MODE_FALLING_EDGE		2
+#define FPGA_IRQ_MODE_BOTH_EDGES		3
+#define FPGA_IRQ_MODE_MASK			3
+#define FPGA_IRQ_MODE_BITWIDTH			2
 
 
 /* Section 3: position sensor (PWM) registers */
@@ -112,5 +123,61 @@
 #define FPGA_REG_IMGADC3_ENABLE			BIT(2)
 #define FPGA_REG_IMGADC4_ENABLE			BIT(3)
 #define FPGA_REG_IMGADC5_ENABLE			BIT(4)
+
+
+/* Section 8: simple PWM control registers */
+/* memory map (offset): */
+#define FPGA_REG_PWM_CONTROL			0x0000
+#define FPGA_REG_PWM_PERIOD			0x0004
+#define FPGA_REG_PWM_DUTY_1			0x0008
+
+/* definition of PWM channel mask */
+#define FPGA_REG_PWM_MASK(n)			BIT(n)
+
+
+/* Section 9: simple GPIO registers */
+/* memory map (offset): */
+#define FPGA_REG_GPIO_INPUT			0x0000
+#define FPGA_REG_GPIO_INT_ENABLE		0x0004
+#define FPGA_REG_GPIO_INT_CLEAR			0x0008
+#define FPGA_REG_GPIO_INT_STATUS		0x000c
+#define FPGA_REG_GPIO_INT_MODE_1		0x0010
+#define FPGA_REG_GPIO_INT_MODE_2		0x0014
+
+/* definition of GPIO channel mask */
+#define FPGA_REG_GPIO_MASK(n)			BIT(n)
+
+
+/* Section 9: FPGA managed ADC registers */
+/* memory map (offset): */
+#define FPGA_REG_ADC_COMPARE_1			0x0000
+#define FPGA_REG_ADC_COMPARE_2			0x0000
+#define FPGA_REG_ADC_COMPARE_3			0x0000
+
+#define FPGA_REG_ADC_THRESHOLD_1		0x0000
+
+#define FPGA_REG_ADC_AVERAGE_1			0x0000
+
+#define FPGA_REG_ADC_INT_ENABLE_1		0x0000
+#define FPGA_REG_ADC_INT_ENABLE_2		0x0004
+#define FPGA_REG_ADC_INT_ENABLE_3		0x0008
+#define FPGA_REG_ADC_INT_CLEAR_1		0x000c
+#define FPGA_REG_ADC_INT_CLEAR_2		0x0010
+#define FPGA_REG_ADC_INT_CLEAR_3		0x0014
+#define FPGA_REG_ADC_INT_STATUS_1		0x0018
+#define FPGA_REG_ADC_INT_STATUS_2		0x001c
+#define FPGA_REG_ADC_INT_STATUS_3		0x0020
+
+#define FPGA_REG_ADC_INT_MODE_1			0x0024
+#define FPGA_REG_ADC_INT_MODE_2			0x0028
+#define FPGA_REG_ADC_INT_MODE_3			0x002c
+#define FPGA_REG_ADC_INT_MODE_4			0x0030
+#define FPGA_REG_ADC_INT_MODE_5			0x0034
+#define FPGA_REG_ADC_INT_MODE_6			0x0038
+
+
+/* definition of ADC channel mask */
+#define FPGA_REG_ADC_MASK(n)			BIT(n)
+
 
 #endif
