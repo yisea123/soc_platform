@@ -28,7 +28,7 @@ struct imagesensor {
 };
 
 /* declaration of imagesensor list */
-extern struct imagesensor imagesensor_list[];
+extern struct imagesensor *imagesensor_list[];
 extern const int imagesensor_num;
 
 

@@ -31,7 +31,7 @@ struct imagedigitiser {
 
 
 /* declaration of imagedigitiser list */
-extern struct imagedigitiser imagedigitiser_list[];
+extern struct imagedigitiser *imagedigitiser_list[];
 extern const int imagedigitiser_num;
 
 /* function prototypes of image digitiser driver (user level) */

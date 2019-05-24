@@ -37,7 +37,7 @@ struct nvram {
 
 
 /* declaration of nvram list */
-extern struct nvram nvram_list[];
+extern struct nvram *nvram_list[];
 extern const int nvram_num;
 
 /* definition of inline function of nvram driver */

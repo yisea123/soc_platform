@@ -14,9 +14,9 @@ int dcmotor_install_devices(void)
 	dev_err = 0;
 	for (i=0; i<dcmotor_num; i++)
 	{
-		if (dcmotor_list[i].install != NULL)
+		if (dcmotor_list[i]->install != NULL)
 		{
-			rs = dcmotor_list[i].install(&dcmotor_list[i]);
+			rs = dcmotor_list[i]->install(dcmotor_list[i]);
 			if (rs == 0)
 				continue;
 		}
@@ -31,7 +31,7 @@ struct dcmotor *dcmotor_get(int index)
 	if (index >= dcmotor_num || index < 0)
 		return NULL;
 	else
-		return &dcmotor_list[index];
+		return dcmotor_list[index];
 }
 
 

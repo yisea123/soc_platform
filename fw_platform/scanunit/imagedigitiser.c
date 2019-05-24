@@ -14,9 +14,9 @@ int imagedigitiser_install_devices(void)
 	dev_err = 0;
 	for (i=0; i<imagedigitiser_num; i++)
 	{
-		if (imagedigitiser_list[i].install != NULL)
+		if (imagedigitiser_list[i]->install != NULL)
 		{
-			rs = imagedigitiser_list[i].install(&imagedigitiser_list[i]);
+			rs = imagedigitiser_list[i]->install(imagedigitiser_list[i]);
 			if (rs == 0)
 				continue;
 		}
@@ -31,7 +31,7 @@ struct imagedigitiser *imagedigitiser_get(int index)
 	if (index >= imagedigitiser_num || index < 0)
 		return NULL;
 	else
-		return &imagedigitiser_list[index];
+		return imagedigitiser_list[index];
 }
 
 

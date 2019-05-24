@@ -14,9 +14,9 @@ int nvram_install_devices(void)
 	dev_err = 0;
 	for (i=0; i<nvram_num; i++)
 	{
-		if (nvram_list[i].install != NULL)
+		if (nvram_list[i]->install != NULL)
 		{
-			rs = nvram_list[i].install(&nvram_list[i]);
+			rs = nvram_list[i]->install(nvram_list[i]);
 			if (rs == 0)
 				continue;
 		}
@@ -31,7 +31,7 @@ struct nvram *nvram_get(int index)
 	if (index >= nvram_num || index < 0)
 		return NULL;
 	else
-		return &nvram_list[index];
+		return nvram_list[index];
 }
 
 

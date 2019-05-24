@@ -5,9 +5,6 @@
  *
  */
 #include "photosensor.h"
-#include "../fpga_io.h"
-#include "../fpga.h"
-
 
 
 int photosensor_install_devices(void)
@@ -17,9 +14,9 @@ int photosensor_install_devices(void)
 	dev_err = 0;
 	for (i=0; i<photosensor_num; i++)
 	{
-		if (photosensor_list[i].install != NULL)
+		if (photosensor_list[i]->install != NULL)
 		{
-			rs = photosensor_list[i].install(&photosensor_list[i]);
+			rs = photosensor_list[i]->install(photosensor_list[i]);
 			if (rs == 0)
 				continue;
 		}
@@ -34,7 +31,7 @@ struct photosensor *photosensor_get(int index)
 	if (index >= photosensor_num || index < 0)
 		return NULL;
 	else
-		return &photosensor_list[index];
+		return photosensor_list[index];
 }
 
 

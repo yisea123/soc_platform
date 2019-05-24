@@ -126,7 +126,7 @@ static inline const struct steppermotor_feature *steppermotor_get_feature(struct
 }
 
 /* declaration of steppermotor list */
-extern struct steppermotor steppermotor_list[];
+extern struct steppermotor *steppermotor_list[];
 extern const int steppermotor_num;
 
 /* upper-level function prototypes of steppermotor driver */

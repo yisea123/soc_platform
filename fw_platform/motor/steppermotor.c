@@ -118,9 +118,9 @@ int steppermotor_install_devices(void)
 	dev_err = 0;
 	for (i=0; i<steppermotor_num; i++)
 	{
-		if (steppermotor_list[i].install != NULL)
+		if (steppermotor_list[i]->install != NULL)
 		{
-			rs = steppermotor_list[i].install(&steppermotor_list[i]);
+			rs = steppermotor_list[i]->install(steppermotor_list[i]);
 			if (rs == 0)
 				continue;
 		}
@@ -135,7 +135,7 @@ struct steppermotor *steppermotor_get(int index)
 	if (index >= steppermotor_num || index < 0)
 		return NULL;
 	else
-		return &steppermotor_list[index];
+		return steppermotor_list[index];
 }
 
 

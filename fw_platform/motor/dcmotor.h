@@ -57,7 +57,7 @@ struct dcmotor_ops {
 
 
 /* declaration of dcmotor list */
-extern struct dcmotor dcmotor_list[];
+extern struct dcmotor *dcmotor_list[];
 extern const int dcmotor_num;
 
 /* function prototypes of dcmotor driver */

@@ -1,6 +1,6 @@
 #include "gpiokey.h"
 
-extern struct gpiokey gpiokey_list[];
+extern struct gpiokey *gpiokey_list[];
 extern const int gpiokey_num ;
 
 static void gpiokey_irq_handler(void *device, int gpio, void *data)
@@ -65,9 +65,9 @@ int gpiokey_install_devices(void)
 	dev_err = 0;
 	for (i=0; i<gpiokey_num; i++)
 	{
-		if (gpiokey_list[i].install != NULL)
+		if (gpiokey_list[i]->install != NULL)
 		{
-			rs = gpiokey_list[i].install(&gpiokey_list[i]);
+			rs = gpiokey_list[i]->install(gpiokey_list[i]);
 			if (rs == 0)
 				continue;
 		}

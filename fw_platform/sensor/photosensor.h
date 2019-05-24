@@ -105,7 +105,7 @@ static inline photosensor_type photosensor_get_type(struct photosensor *sensor)
 
 
 /* declaration of photosensor list */
-extern struct photosensor photosensor_list[];
+extern struct photosensor *photosensor_list[];
 extern const int photosensor_num;
 
 

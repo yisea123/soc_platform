@@ -14,9 +14,9 @@ int imagesensor_install_devices(void)
 	dev_err = 0;
 	for (i=0; i<imagesensor_num; i++)
 	{
-		if (imagesensor_list[i].install != NULL)
+		if (imagesensor_list[i]->install != NULL)
 		{
-			rs = imagesensor_list[i].install(&imagesensor_list[i]);
+			rs = imagesensor_list[i]->install(imagesensor_list[i]);
 			if (rs == 0)
 				continue;
 		}
@@ -31,7 +31,7 @@ struct imagesensor *imagesensor_get(int index)
 	if (index >= imagesensor_num || index < 0)
 		return NULL;
 	else
-		return &imagesensor_list[index];
+		return imagesensor_list[index];
 }
 
 

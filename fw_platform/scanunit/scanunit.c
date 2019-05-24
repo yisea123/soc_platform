@@ -16,8 +16,6 @@
 
 
 extern const struct scanunit_hwinfo scanner_hwinfo;
-extern struct imagedigitiser imagedigitiser_list[];
-extern struct imagesensor imagesensor_list[];
 
 static volatile uint32_t *scanctrl_reg_base;
 static uint32_t scan_int_mask;
@@ -112,7 +110,7 @@ int scanunit_get_digitiser_config(int device, struct scanunit_config *config)
 	if (config->regcount <= 0 || config->regconfig == NULL)
 		return -1;
 
-	rs = imagedigitiser_get_config(&imagedigitiser_list[device], config);
+	rs = imagedigitiser_get_config(imagedigitiser_list[device], config);
 
 	return rs;
 }
@@ -127,7 +125,7 @@ int scanunit_set_digitiser_config(int device, const struct scanunit_config *conf
 	if (config->regcount <= 0 || config->regconfig == NULL)
 		return -1;
 
-	rs = imagedigitiser_set_config(&imagedigitiser_list[device], config);
+	rs = imagedigitiser_set_config(imagedigitiser_list[device], config);
 
 	return rs;
 }
@@ -142,7 +140,7 @@ int scanunit_get_digitiser_aux_config(int device, struct scanunit_config *config
 	if (config->regcount <= 0 || config->regconfig == NULL)
 		return -1;
 
-	rs = imagedigitiser_get_aux_config(&imagedigitiser_list[device], config);
+	rs = imagedigitiser_get_aux_config(imagedigitiser_list[device], config);
 
 	return rs;
 }
@@ -157,7 +155,7 @@ int scanunit_set_digitiser_aux_config(int device, const struct scanunit_config *
 	if (config->regcount <= 0 || config->regconfig == NULL)
 		return -1;
 
-	rs = imagedigitiser_set_aux_config(&imagedigitiser_list[device], config);
+	rs = imagedigitiser_set_aux_config(imagedigitiser_list[device], config);
 
 	return rs;
 }
@@ -172,7 +170,7 @@ int scanunit_get_sensor_config(int device, struct scanunit_config *config)
 	if (config->regcount <= 0 || config->regconfig == NULL)
 		return -1;
 
-	rs = imagesensor_get_config(&imagesensor_list[device], config);
+	rs = imagesensor_get_config(imagesensor_list[device], config);
 
 	return rs;
 }
@@ -187,7 +185,7 @@ int scanunit_set_sensor_config(int device, const struct scanunit_config *config)
 	if (config->regcount <= 0 || config->regconfig == NULL)
 		return -1;
 
-	rs = imagesensor_set_config(&imagesensor_list[device], config);
+	rs = imagesensor_set_config(imagesensor_list[device], config);
 
 	return rs;
 }
