@@ -1949,14 +1949,38 @@
     <file>
       <name>$PROJ_DIR$\..\..\fw_platform\fpga\fpga.c</name>
     </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\fpga\fpga_adc.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\fpga\fpga_adc.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\fpga\fpga_gpio.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\fpga\fpga_gpio.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\fpga\fpga_irqmux.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\fpga\fpga_irqmux.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\fpga\fpga_pwm.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\fpga\fpga_pwm.h</name>
+    </file>
   </group>
   <group>
     <name>gpiokey</name>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\gpiokey\gpiokey.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\gpiokey\gpiokey.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\gpiokey\gpiokey.h</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\gpiokey\gpiokey.h</name>
     </file>
   </group>
   <group>
@@ -1968,7 +1992,7 @@
       <name>$PROJ_DIR$\..\..\include\motor.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\include\nvmapi.h</name>
+      <name>$PROJ_DIR$\..\..\include\nvmapi.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\include\pwm.h</name>
@@ -1980,22 +2004,22 @@
   <group>
     <name>mechanism</name>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\mechanism\mech_motor.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\mechanism\mech_motor.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\mechanism\mech_motor.h</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\mechanism\mech_motor.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\mechanism\mech_sensor.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\mechanism\mech_sensor.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\mechanism\mech_sensor.h</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\mechanism\mech_sensor.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\mechanism\mech_unit.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\mechanism\mech_unit.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\mechanism\mech_unit.h</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\mechanism\mech_unit.h</name>
     </file>
   </group>
   <group>
@@ -2025,43 +2049,43 @@
   <group>
     <name>nvram</name>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\at24cxx.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\nvram\at24cxx.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\at24cxx.h</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\nvram\at24cxx.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\mt5ql128aba.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\nvram\mt5ql128aba.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\nvmapi.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\nvram\nvmapi.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\nvram.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\nvram\nvram.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\nvram.h</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\nvram\nvram.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\s25fl128p.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\nvram\s25fl128p.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\socnvm.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\nvram\socnvm.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\socnvm.h</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\nvram\socnvm.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\spiflash.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\nvram\spiflash.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\spiflash.h</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\nvram\spiflash.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\w25q16jv.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\nvram\w25q16jv.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\nvram\w25q32jv.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\nvram\w25q32jv.c</name>
     </file>
   </group>
   <group>
@@ -2100,10 +2124,34 @@
   <group>
     <name>sensor</name>
     <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\sensor\adc.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\sensor\adc.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\sensor\fpga_photosensor.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\sensor\fpga_photosensor.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\sensor\fpga_simplesensor.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\sensor\fpga_simplesensor.h</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\..\fw_platform\sensor\gpio_photosensor.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\fw_platform\sensor\gpio_photosensor.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\sensor\gpio_simplesensor.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\sensor\gpio_simplesensor.h</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\fw_platform\sensor\photosensor.c</name>
@@ -2111,26 +2159,32 @@
     <file>
       <name>$PROJ_DIR$\..\..\fw_platform\sensor\photosensor.h</name>
     </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\sensor\simplesensor.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\fw_platform\sensor\simplesensor.h</name>
+    </file>
   </group>
   <group>
     <name>usbd</name>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\usbd\mss_usb_device_vendor.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\usbd\mss_usb_device_vendor.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\usbd\mss_usb_device_vendor.h</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\usbd\mss_usb_device_vendor.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\usbd\usb_user_descriptors.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\usbd\usb_user_descriptors.c</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\usbd\usbd_driver.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\usbd\usbd_driver.c</name>
     </file>
   </group>
   <group>
     <name>utility</name>
     <file>
-      <name>$PROJ_DIR$\..\..\..\..\platform\fw_platform\utility\crc32.c</name>
+      <name>$PROJ_DIR$\..\..\fw_platform\utility\crc32.c</name>
     </file>
   </group>
   <file>
