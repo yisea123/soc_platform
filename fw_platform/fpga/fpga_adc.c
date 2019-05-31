@@ -34,12 +34,15 @@ static void fpga_adc_irqhandler(void *device, int num, void *data)
 	/* get and clear interrupt flag of all channels */
 	fpga_readl(&value, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_STATUS_1);
 	fpga_writel(value, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_CLEAR_1);
+	fpga_writel(0, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_CLEAR_1);
 	status = value & 0xff;
 	fpga_readl(&value, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_STATUS_2);
 	fpga_writel(value, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_CLEAR_2);
+	fpga_writel(0, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_CLEAR_2);
 	status |= (value & 0xff) << 8;
 	fpga_readl(&value, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_STATUS_3);
 	fpga_writel(value, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_CLEAR_3);
+	fpga_writel(0, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_CLEAR_3);
 	status |= (value & 0xff) << 16;
 
 	mask = 1;
@@ -60,8 +63,11 @@ static int fpga_adc_init(struct ad_converter *adc, void *data)
 	fpga_writel(0u, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_ENABLE_2);
 	fpga_writel(0u, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_ENABLE_3);
 	fpga_writel(0xffu, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_CLEAR_1);
+	fpga_writel(0u, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_CLEAR_1);
 	fpga_writel(0xffu, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_CLEAR_2);
+	fpga_writel(0u, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_CLEAR_2);
 	fpga_writel(0xffu, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_CLEAR_3);
+	fpga_writel(0u, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_CLEAR_3);
 	fpga_writel(0u, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_MODE_1);
 	fpga_writel(0u, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_MODE_2);
 	fpga_writel(0u, (char *)adc_rc->base_addr + FPGA_REG_ADC_INT_MODE_3);
@@ -203,6 +209,8 @@ int fpga_adc_install(struct ad_converter *adc)
 	adc->set_event = fpga_adc_set_event;
 	adc->unset_event = fpga_adc_unset_event;
 
+	fpga_adc_init(adc, NULL);
+	
 	adc_rc = (const struct fpga_adc_resource *)adc->resource;
 
 	/* Configure IRQ handler */

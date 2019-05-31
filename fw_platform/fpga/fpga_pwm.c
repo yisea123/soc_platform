@@ -12,11 +12,6 @@
 #include "fpga_pwm.h"
 
 
-#define BITS_15_TO_8(v)	(((v) >> 8) & 0xff)
-#define BITS_11_TO_4(v)	(((v) >> 4) & 0xff)
-#define BITS_7_TO_0(v)	((v) & 0xff)
-
-
 /*-------------------------------------------------------------------------*//**
  * SPWM_init()
  */

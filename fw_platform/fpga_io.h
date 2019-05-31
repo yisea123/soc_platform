@@ -19,7 +19,19 @@ static __INLINE int32_t fpga_readl(uint32_t *value, const volatile void  *addr)
 
 static __INLINE int32_t fpga_writel(uint32_t value, volatile void  *addr)
 {
-	writew(value, addr);
+	int i;
+	uint32_t tmp_val;
+
+	for(i=0; i<5; i++)
+	{
+		writew(value, addr);
+		fpga_readl(&tmp_val, addr);
+		if(tmp_val==value)
+			break;
+	}
+	if(i==5)
+		printf("fpga_writel error!addr=0x%x w_value=0x%x r_value=%x\n\r", addr, value, tmp_val);
+	
 	return 0;
 }
 
@@ -78,8 +90,21 @@ static __INLINE int32_t fpga_writenw(volatile void *addr, const void *buffer, in
 static __INLINE int32_t fpga_update_lbits(volatile void *addr, uint32_t mask, uint32_t value)
 {
 	uint32_t val = readl(addr);
+	int i;
+	uint32_t tmp_val;
+	
 	val = (val & ~mask) | (value & mask);
-	writel(val, addr);
+
+	for(i=0; i<5; i++)
+	{
+		writel(val, addr);
+		fpga_readl(&tmp_val, addr);
+		if(tmp_val==val)
+			break;
+	}
+	if(i==5)
+		printf("fpga_update_lbits error!addr=0x%x w_value=0x%x r_value=%x\n\r", addr, val, tmp_val);
+
 	return 0;
 }
 

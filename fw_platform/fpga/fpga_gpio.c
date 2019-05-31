@@ -23,16 +23,20 @@
 static void SGPIO_irqhandler(void *device, int num, void *data)
 {
 	sgpio_instance_t *gpio = (sgpio_instance_t *)data;
-	uint32_t status, value, mask;
+	uint32_t status, mask;
 	int i;
 
 	if (!gpio->irqmux)
 		fpga_clear_interrupt(gpio->irqmask);
 
 	/* get and clear interrupt flag of all ports */
-	fpga_readl(&value, (char *)gpio->base_addr + FPGA_REG_GPIO_INT_STATUS);
-	fpga_writel(value, (char *)gpio->base_addr + FPGA_REG_GPIO_INT_CLEAR);
-
+	fpga_readl(&status, (char *)gpio->base_addr + FPGA_REG_GPIO_INT_STATUS);
+	if(!status)
+		return;
+	
+	fpga_writel(status, (char *)gpio->base_addr + FPGA_REG_GPIO_INT_CLEAR);
+	fpga_writel(0, (char *)gpio->base_addr + FPGA_REG_GPIO_INT_CLEAR);	
+	
 	mask = 1;
 	for (i=0; i < NB_OF_SGPIO; i++)
 	{
@@ -55,6 +59,7 @@ void SGPIO_init(sgpio_instance_t * gpio)
 	/*  reset GPIO chip's interrupt control logics if available */
 	fpga_writel(0u, (char *)gpio->base_addr + FPGA_REG_GPIO_INT_ENABLE);
 	fpga_writel(0xffu, (char *)gpio->base_addr + FPGA_REG_GPIO_INT_CLEAR);
+	fpga_writel(0, (char *)gpio->base_addr + FPGA_REG_GPIO_INT_CLEAR);
 	fpga_writel(0u, (char *)gpio->base_addr + FPGA_REG_GPIO_INT_MODE_1);
 	fpga_writel(0u, (char *)gpio->base_addr + FPGA_REG_GPIO_INT_MODE_2);
 

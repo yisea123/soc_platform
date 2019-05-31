@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "hal.h"
 #include "fpga.h"
-
+#include "adc.h"
 
 struct fpga_adc_resource {
 	addr_t		base_addr;
