@@ -17,6 +17,7 @@
 
 struct dcmotor_config {
 	motion_dir dir;				// motor motion direction
+	uint32_t time_to_run;			// uint:ms
 };
 
 struct dcmotor_feature{
@@ -53,11 +54,12 @@ struct dcmotor_ops {
 
 	int	(*start)(struct dcmotor *motor);
 	void	(*stop)(struct dcmotor *motor);
+	void	(*reset)(struct dcmotor *motor);
 };
 
 
 /* declaration of dcmotor list */
-extern struct dcmotor *dcmotor_list[];
+extern struct dcmotor * dcmotor_list[];
 extern const int dcmotor_num;
 
 /* function prototypes of dcmotor driver */
