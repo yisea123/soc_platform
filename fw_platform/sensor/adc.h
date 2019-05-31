@@ -62,7 +62,7 @@ struct ad_converter {
 
 
 /* declaration of ADC list */
-extern struct ad_converter * adconverter_list[];
+extern struct ad_converter * ad_converter_list[];
 extern const int adconverter_num;
 
 

@@ -14,9 +14,9 @@ int adc_install_devices(void)
 	dev_err = 0;
 	for (i=0; i<adconverter_num; i++)
 	{
-		if (adconverter_list[i]->install != NULL)
+		if (ad_converter_list[i]->install != NULL)
 		{
-			rs = adconverter_list[i]->install(adconverter_list[i]);
+			rs = ad_converter_list[i]->install(ad_converter_list[i]);
 			if (rs == 0)
 				continue;
 		}
@@ -31,7 +31,7 @@ struct ad_converter *adc_get(int index)
 	if (index >= adconverter_num || index < 0)
 		return NULL;
 	else
-		return adconverter_list[index];
+		return ad_converter_list[index];
 }
 
 

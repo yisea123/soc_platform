@@ -44,7 +44,6 @@ static int fpga_simplesensor_status(struct simplesensor *sensor, int *status)
 {
 	struct fpga_simplesensor_resource *sensor_rc;
 	uint32_t fpga_inputs;
-	int st;
 
 	if (!sensor || !status)
 		return -1;
@@ -52,9 +51,10 @@ static int fpga_simplesensor_status(struct simplesensor *sensor, int *status)
 	sensor_rc = (struct fpga_simplesensor_resource *)sensor->resource;
 
 	fpga_inputs = SGPIO_get_inputs(sensor_rc->gpiochip);
-	st = (fpga_inputs & (1 << sensor_rc->gpio)) ? 1 : 0;
-	*status = (sensor->status_mapping == SENSOR_ST_DETETED_IS_HIGHLEVEL) ? st : !st;
+	*status = (fpga_inputs & (1 << sensor_rc->gpio)) ? 1 : 0;
 
+	if(sensor->status_mapping == SENSOR_ST_DETETED_IS_LOWLEVEL)
+		*status = !(*status);
 	return 0;
 }
 
@@ -146,7 +146,8 @@ static const struct simplesensor_ops fpga_simplesensor_ops = {
 int fpga_simplesensor_install(struct simplesensor *sensor)
 {
 	struct fpga_simplesensor_resource *sensor_rc;
-
+	sgpio_instance_t *gpio;
+	
 	if (!sensor)
 		return -1;
 	if (!sensor->resource)
@@ -158,8 +159,9 @@ int fpga_simplesensor_install(struct simplesensor *sensor)
 	/* Configure the input */
 	if (!sensor_rc->gpiochip)	// check digital sensor input
 			return -1;
-	fabric_irqcallback_install((gpio_id_t)sensor_rc->gpio, (irqcallback_t)fpga_simplesensor_eventhandler, sensor);
-
+			
+	gpio = (sgpio_instance_t *)sensor_rc->gpiochip;
+	SGPIO_set_irqcallback(gpio, (gpio_id_t)sensor_rc->gpio, (irqcallback_t)fpga_simplesensor_eventhandler, sensor);
 	return 0;
 }
 

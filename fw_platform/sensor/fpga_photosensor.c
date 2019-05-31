@@ -70,6 +70,8 @@ static int fpga_photosensor_status(struct photosensor *sensor, int *status)
 		if (rs != 0)
 			return -1;
 	}
+	if(sensor->status_mapping == SENSOR_ST_DETETED_IS_LOWLEVEL)
+		*status = !(*status);
 	return 0;
 }
 
