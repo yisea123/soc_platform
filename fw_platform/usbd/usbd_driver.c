@@ -11,7 +11,7 @@
 #include "hal.h"
 #include "mss_assert.h"
 #include "mss_usb_device_vendor.h"
-
+#include "mss_usb_std_def.h"
 
 #define USBD_RX_TIMEOUT      (2*1000/portTICK_RATE_MS)
 #define USBD_TX_TIMEOUT      (2*1000/portTICK_RATE_MS)
@@ -145,6 +145,9 @@ int usbd_read(uint8_t* buf, uint32_t len)
 	return cnt;
 }
 
+extern struct usbd_config *pusbd_config;
+extern uint8_t device_descriptor[USB_STD_DEVICE_DESCR_LEN];
+
 int usbd_install(const struct usbd_config *config)
 {
 	usb_online = 0;
@@ -163,6 +166,16 @@ int usbd_install(const struct usbd_config *config)
 		return -1;
 #endif
 
+	pusbd_config = (struct usbd_config *)config;
+	if(pusbd_config)
+	{
+		device_descriptor[IDVENDOR_LSB_IDX] =   (uint8_t)pusbd_config->vendor_id & 0xff;
+		device_descriptor[IDVENDOR_MSB_IDX] =   (uint8_t)(pusbd_config->vendor_id>>8) & 0xff;
+		device_descriptor[IDPRODUCT_LSB_IDX] =   (uint8_t)pusbd_config->product_id & 0xff;
+		device_descriptor[IDPRODUCT_MSB_IDX] =   (uint8_t)(pusbd_config->product_id>>8) & 0xff;
+		device_descriptor[BCDDEVICE_LSB_IDX] =   (uint8_t)pusbd_config->bcd_device & 0xff;
+		device_descriptor[BCDDEVICE_MSB_IDX] =   (uint8_t)(pusbd_config->bcd_device>>8) & 0xff;
+	}	  
 	/* Initialize USB driver. */
 	MSS_USBD_init(MSS_USB_DEVICE_HS);
 
@@ -171,6 +184,8 @@ int usbd_install(const struct usbd_config *config)
 
 	/*Initialize the USBD_VENDOR class driver*/
 	MSS_USBD_VENDOR_init(MSS_USB_DEVICE_HS);
+
+
 
 	return 0;
 }

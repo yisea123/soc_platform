@@ -3,15 +3,28 @@
 
 #include <stdint.h>
 
-
 /* USB device configuration block */
 struct usbd_config
 {
 	uint16_t vendor_id;		/* USB Vendor ID */
 	uint16_t product_id;		/* USB Product ID */
-	uint8_t	usb_class;		/* USB class */
-	const char *product_name;	/* product name */
+	uint16_t bcd_device;		/* USB bcd_device */
+	const char *str_manufacture;	/* manufacture string */
+	const char *str_product;	/* product string */
+	const char *str_serial;		/* serial string */
+	const char *str_config;		/* config string */
+	const char *str_interface;	/* interface string */
 };
+
+
+typedef enum {
+	IDVENDOR_LSB_IDX = 8,
+	IDVENDOR_MSB_IDX,
+	IDPRODUCT_LSB_IDX,
+	IDPRODUCT_MSB_IDX,
+	BCDDEVICE_LSB_IDX,
+	BCDDEVICE_MSB_IDX,
+}usbd_descriptor_idx_t;
 
 
 int usbd_install(const struct usbd_config *config);

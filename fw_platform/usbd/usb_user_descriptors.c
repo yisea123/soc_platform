@@ -18,7 +18,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+#include "usbdrv.h"
 /*******************************************************************************
  * Constant definitions
  */
@@ -31,12 +31,6 @@ extern "C" {
 #define  USB_STRING_DESCRIPTOR_IDX_SERIAL                   0x03
 #define  USB_STRING_DESCRIPTOR_IDX_CONFIG                   0x04
 #define  USB_STRING_DESCRIPTOR_IDX_INTERFACE                0x05
-
-#define  USB_STRING_MANUFACTURER                            "Greatwall"
-#define  USB_STRING_PRODUCT                                 "Card-Scanner"
-#define  USB_STRING_SERIAL                                  "VENDOR1"
-#define  USB_STRING_CONFIG                                  "High Speed"
-#define  USB_STRING_INTERFACE                               "Interface-Vendor"
 
 /*******************************************************************************
  * Local functions.
@@ -118,6 +112,7 @@ mss_usbd_user_descr_cb_t vendor_dev_descriptors_cb = {
 };
 
 uint8_t g_string_descriptor[USB_MAX_STRING_DESCRIPTOR_SIZE];
+struct usbd_config *pusbd_config;
 
 uint8_t*
 vendor_dev_device_descriptor
@@ -162,29 +157,42 @@ vendor_dev_string_descriptor
         break;
 
         case USB_STRING_DESCRIPTOR_IDX_MANUFACTURER:
-            *length = vendor_dev_get_string((uint8_t*)USB_STRING_MANUFACTURER,
-                                             g_string_descriptor);
-        break;
-
+		if(pusbd_config)
+			*length = vendor_dev_get_string((uint8_t*)pusbd_config->str_manufacture,
+		                             g_string_descriptor);
+		else
+			*length = 0;
+		break;
         case USB_STRING_DESCRIPTOR_IDX_PRODUCT:
-            *length = vendor_dev_get_string((uint8_t*)USB_STRING_PRODUCT,
-                                             g_string_descriptor);
-        break;
+		if(pusbd_config)
+			*length = vendor_dev_get_string((uint8_t*)pusbd_config->str_product,
+		                             g_string_descriptor);
+		else
+			*length = 0;
+        	break;
 
         case USB_STRING_DESCRIPTOR_IDX_SERIAL:
-            *length = vendor_dev_get_string((uint8_t*)USB_STRING_SERIAL,
-                                             g_string_descriptor);
-        break;
+		if(pusbd_config)
+			*length = vendor_dev_get_string((uint8_t*)pusbd_config->str_serial,
+		                             g_string_descriptor);
 
+		else
+		     	*length = 0;
+		break;
         case USB_STRING_DESCRIPTOR_IDX_CONFIG:
-            *length = vendor_dev_get_string((uint8_t*)USB_STRING_CONFIG,
+		if(pusbd_config)
+			*length = vendor_dev_get_string((uint8_t*)pusbd_config->str_config,
                                              g_string_descriptor);
-        break;
-
+		else
+		     	*length = 0;
+       		break;
         case USB_STRING_DESCRIPTOR_IDX_INTERFACE:
-            *length = vendor_dev_get_string((uint8_t*)USB_STRING_INTERFACE,
+		if(pusbd_config)
+	    		*length = vendor_dev_get_string((uint8_t*)pusbd_config->str_interface,
                                              g_string_descriptor);
-        break;
+		else
+		     	*length = 0;
+        	break;
         default:
            /*Raise error*/
           *length = 0;
